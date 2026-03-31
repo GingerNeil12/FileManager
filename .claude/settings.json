@@ -1,0 +1,53 @@
+{
+    "$schema": "https://json.schemastore.org/claude-code-settings.json",
+
+    "permissions": {
+        "allow": [
+            "Read",
+            "Bash(npm run lint *)",
+            "Bash(npm run test *)",
+            "Bash(npm run typecheck)",
+            "Bash(npm run build)",
+            "Bash(git status)",
+            "Bash(git diff *)",
+            "Bash(git log *)",
+            "Bash(git branch *)",
+            "Bash(git stash *)",
+            "Bash(git rev-parse *)",
+            "Bash(git checkout *)",
+            "Bash(dotnet build:*)",
+            "Bash(dotnet run:*)",
+            "Bash(dotnet test:*)",
+            "Bash(dotnet clean:*)",
+            "Bash(dotnet restore:*)",
+            "Bash(dotnet ef migrations add *)",
+            "Bash(dotnet ef migrations list)",
+            "Bash(dotnet ef migrations script *)",
+            "Bash(dotnet ef database update *)",
+            "Bash(dotnet ef dbcontext list)",
+            "Bash(dotnet ef dbcontext info)",
+            "Bash(docker buid:*)",
+            "Bash(docker compose:*)"
+        ],
+        "deny": [
+            "Read(**/.env)",
+            "Read(**/.env.*)",
+            "Read(**/secrets/**)",
+            "Read(**/*.pem)",
+            "Read(**/*.key)",
+            "Write(**/.env)",
+            "Write(**/.env.*)",
+            "Write(**/secrets/**)",
+            "Write(**/*.pem)",
+            "Write(**/*.key)",
+            "Edit(**/.env)",
+            "Edit(**/.env.*)",
+            "Edit(**/secrets/**)",
+            "Edit(**/*.pem)",
+            "Edit(**/*.key)",
+            "Bash(git add *)",
+            "Bash(git fetch *)",
+            "Bash(git switch *)",
+        ]
+    }
+}
