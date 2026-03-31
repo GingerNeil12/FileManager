@@ -1,0 +1,88 @@
+# ============================================================
+# .NET
+# ============================================================
+bin/
+obj/
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+.vs/
+*.rsuser
+*.pidb
+*.booproj
+*.svd
+*.pdb
+*.opendb
+*.VC.db
+
+# NuGet
+*.nupkg
+*.snupkg
+**/packages/
+!**/packages/build/
+nuget.config.local
+project.lock.json
+project.fragment.lock.json
+artifacts/
+
+# ASP.NET / runtime
+appsettings.Development.json
+appsettings.Local.json
+
+# ============================================================
+# Angular / Node
+# ============================================================
+node_modules/
+dist/
+.angular/
+*.js.map
+
+# Environment files
+.env
+.env.*
+!.env.example
+
+# ============================================================
+# Auth0 / Secrets
+# ============================================================
+# Never commit real credentials or secrets
+**/secrets.json
+**/auth0-config.json
+**/.auth0/
+
+# ============================================================
+# Azure
+# ============================================================
+# Local Azure Storage emulator data
+.azurite/
+azurite/
+__azurite_db*.json
+# Azure Functions local config (may contain connection strings)
+local.settings.json
+
+# ============================================================
+# Docker
+# ============================================================
+.dockerignore.local
+docker-compose.override.yml
+docker-compose.local.yml
+
+# ============================================================
+# IDEs & editors
+# ============================================================
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+.DS_Store
+Thumbs.db
+
+# ============================================================
+# Logs & temp
+# ============================================================
+logs/
+*.log
+tmp/
+temp/
