@@ -1,0 +1,14 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/FileManager.Application/FileManager.Application.csproj" />
+    <Project Path="src/FileManager.Domain/FileManager.Domain.csproj" />
+    <Project Path="src/FileManager.Persistence/FileManager.Persistence.csproj" />
+    <Project Path="src/FileManager.WebApi/FileManager.WebApi.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/FileManager.Application.Tests/FileManager.Application.Tests.csproj" />
+    <Project Path="tests/FileManager.Domain.Tests/FileManager.Domain.Tests.csproj" />
+    <Project Path="tests/FileManager.Persistence.Tests/FileManager.Persistence.Tests.csproj" />
+    <Project Path="tests/FileManager.WebApi.Tests/FileManager.WebApi.Tests.csproj" />
+  </Folder>
+</Solution>
