@@ -47,7 +47,48 @@
             "Edit(**/*.key)",
             "Bash(git add *)",
             "Bash(git fetch *)",
-            "Bash(git switch *)",
+            "Bash(git switch *)"
+        ]
+    },
+
+    "hooks": {
+        "SessionStart": [
+            {
+                "hooks": [
+                    {
+                        "type": "command",
+                        "command": "bash .claude/hooks/session-start.sh"
+                    }
+                ]
+            }
+        ],
+        "PreToolUse": [
+            {
+                "matcher": "Bash",
+                "hooks": [
+                    {
+                        "type": "command",
+                        "command": "bash .claude/hooks/block-dangerous-commands.sh"
+                    }
+                ]
+            },
+            {
+                "matcher": "Edit|Write",
+                "hooks": [
+                    {
+                        "type": "command",
+                        "command": "bash .claude/hooks/scan-secrets.sh"
+                    },
+                    {
+                        "type": "command",
+                        "command": "bash .claude/hooks/protect-files.sh"
+                    },
+                    {
+                        "type": "command",
+                        "command": "bash .claude/hooks/block-generated-files.sh"
+                    }
+                ]
+            }
         ]
     }
 }
