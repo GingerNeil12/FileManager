@@ -11,4 +11,5 @@ When adding a new feature we need a plan. The plan will be in the Plans director
 4. **Tests** - write tests using `test-writer-dotnet` to generate tests for the .net codebase and `test-writer-angular` for the Angular codebase.
 5. **Build and Test** - run builds and test suites to ensure everything is working as expected.
 6. **Simplify** - run 'simplify' to refactor and clean up the codebase.
-7. **Archive plan** - once the feature is complete, move the plan from `Plans` to `Plans/Archived`.
+7. **Update the plan** - Update plan.md to reflect any deviations or decisions made during implementation that differ from the original design. Add a final summary table of files created, modified, and deleted.
+8. **Archive plan** - once the feature is complete, move the plan from `Plans` to `Plans/Archived`.
