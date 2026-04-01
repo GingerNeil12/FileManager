@@ -102,7 +102,7 @@ Assert.That(result.Error, Is.InstanceOf<ExpectedErrorType>());
 - Always assert arguements on received calls: `Received(1)` alone is not sufficient
 - Use `Arg.Any<T>()` sparingl: prefer specific matchers so tests catch wrong values being passed
 - Setup return values: `mockService.GetById(id).Returns(entity)`
-- Verify calls: `mockService.Receieved(1).GetById(Arg.Is<Guid>(id => fileId))`
+- Verify calls: `mockService.Received(1).GetById(Arg.Is<Guid>(id => fileId))`
 
 ### EF Core TestContainers
 
