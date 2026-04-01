@@ -1,0 +1,6 @@
+@FileManager.WebApi_HostAddress = http://localhost:5115
+
+GET {{FileManager.WebApi_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
