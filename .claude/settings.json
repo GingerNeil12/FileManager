@@ -4,6 +4,7 @@
     "permissions": {
         "allow": [
             "Read",
+            "Bash(ls *)",
             "Bash(npm run lint *)",
             "Bash(npm run test *)",
             "Bash(npm run typecheck)",
