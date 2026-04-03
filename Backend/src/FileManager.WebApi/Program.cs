@@ -1,3 +1,4 @@
+using FileManager.WebApi.Option;
 using Scalar.AspNetCore;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -6,6 +7,10 @@ builder.WebHost.ConfigureKestrel(options => options.AddServerHeader = false);
 builder.Services.AddOpenApi();
 builder.Services.AddRouting(options => options.LowercaseUrls = true);
 builder.Services.AddControllers();
+
+builder
+    .Services
+    .Configure<ApplicationInfo>(builder.Configuration.GetSection(ApplicationInfo.SectionName));
 
 var app = builder.Build();
 
