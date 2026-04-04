@@ -15,7 +15,5 @@ public class VersionController(IOptions<ApplicationInfo> options) : ControllerBa
     [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(VersionDto))]
     [ProducesResponseType(StatusCodes.Status500InternalServerError, Type = typeof(ProblemDetails))]
     public IActionResult GetVersion()
-    {
-        return Ok(new VersionDto(options.Value.Name, options.Value.Version));
-    }
+        => Ok(new VersionDto(options.Value.Name, options.Value.Version));
 }

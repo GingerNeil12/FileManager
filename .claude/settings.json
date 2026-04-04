@@ -63,6 +63,18 @@
                 ]
             }
         ],
+        "PostToolUse": [
+            {
+                "matcher": "Edit|Write",
+                "hooks": [
+                    {
+                        "type": "command",
+                        "command": "bash .claude/hooks/format-on-save.sh",
+                        "statusMessage": "Formatting..."
+                    }
+                ]
+            }
+        ],
         "PreToolUse": [
             {
                 "matcher": "Bash",
