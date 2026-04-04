@@ -1,0 +1,17 @@
+services:
+  backend:
+    build:
+      context: ./Backend
+      dockerfile: src/FileManager.WebApi/Dockerfile
+    ports:
+      - "8080:8080"
+    environment:
+      - ASPNETCORE_HTTP_PORTS=8080
+
+  frontend:
+    build:
+      context: ./Frontend
+    ports:
+      - "80:80"
+    depends_on:
+      - backend
