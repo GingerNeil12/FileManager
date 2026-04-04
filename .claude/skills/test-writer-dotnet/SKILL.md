@@ -34,10 +34,12 @@ For EACH scenario identified above, write a test. No skipping.
 ### Structure
 
 - **One assert per test**: Each test should verify one specific behavior or outcome.
+- **Assert.EnterMultipleScope** use this if there is multiple asserts being done in the test that are connected.
 - **Arrange-Act-Assert**: Follow this pattern for clarity using `//Arrange`, `//Act`, and `//Assert` comments for each section.
   - Arrange: Set up necessary objects, mocks, and inputs.
   - Act: Call the method under test.
   - Assert: Verify the expected outcome.
+- **nullable disable** set `#nullable disable` at the top of the test files. This means there is no need to deal with nullable using `null!` or `?`.
 
 ### What to test
 
