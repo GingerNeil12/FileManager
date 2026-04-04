@@ -4,6 +4,7 @@
     "permissions": {
         "allow": [
             "Read",
+            "Bash(ls *)",
             "Bash(npm run lint *)",
             "Bash(npm run test *)",
             "Bash(npm run typecheck)",
@@ -58,6 +59,18 @@
                     {
                         "type": "command",
                         "command": "bash .claude/hooks/session-start.sh"
+                    }
+                ]
+            }
+        ],
+        "PostToolUse": [
+            {
+                "matcher": "Edit|Write",
+                "hooks": [
+                    {
+                        "type": "command",
+                        "command": "bash .claude/hooks/format-on-save.sh",
+                        "statusMessage": "Formatting..."
                     }
                 ]
             }
