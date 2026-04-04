@@ -45,7 +45,7 @@ alwaysApply: true
 - Use `WebApplicationFactory<Program>` for endpoint/controller integration tests.
 - Override services and configuration by `ConfigureWebHost`.
 
-## Angular (Typescript - Jasmine + TestBed)
+## Angular (Typescript - Vitest + TestBed)
 
 **Naming**
 - Test descriptions use sentence case: `should return empty array when input is empty`.
@@ -59,6 +59,12 @@ alwaysApply: true
 - Use `HttpClientTestingModule` for any service making HTTP calls. Use `HttpTestingController` to assert request urls, methods and bodies, not just the service method completed.
 - Flush or error requests in `afterEach` via `httpTestingController.verify()` to catch unexpected requests.
 
+**Mocking (Vitest)**
+- Use `vi.spyOn` at system boundaries only — never spy on the service under test itself.
+- Use `vi.fn()` for standalone mock functions.
+- Always assert spy was called with expected arguments: `.toHaveBeenCalledWith(...)` not just `.toHaveBeenCalled()`.
+- Reset mocks between tests via `vi.clearAllMocks()` in `afterEach` to prevent state leakage.
+
 **Async**
 - Use `fakeAsync`/`tick` for testing timers, debounce and Observable delays.
-- Use `async`/`await` with `fixture.whenStable()` for premise-base async in component tests.
+- Use `async`/`await` with `fixture.whenStable()` for promise-based async in component tests.
