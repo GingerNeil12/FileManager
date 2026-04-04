@@ -65,20 +65,25 @@ Prepend a new entry (most recent at top) using the commit history since the last
 git log release/<last-version>..develop --oneline
 ```
 
-Formate the entry as follows, incuding only the sections for the projects that have changed:
+Format the entry as follows, including only the sections for the projects that have changed:
 
 ```markdown
 ## release/<new-version> - YYYY-MM-DD
 
 ### Backend (<new backend version>)
-<breif summary of backend changes derived from commit history>
+
+- <change derived from commit history>
+- <change derived from commit history>
 
 ### Frontend (<new frontend version>)
-<breif summary of frontend changes derived from commit history>
 
-___
+- <change derived from commit history>
+- <change derived from commit history>
 
+---
 ```
+
+Prepend the new entry directly below the `# Version Tracker` heading. If the heading does not exist, add it at the top of the file before the first entry. The heading must always remain the first line of the file.
 
 Stage and commit:
 ```
