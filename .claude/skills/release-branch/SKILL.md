@@ -90,29 +90,3 @@ Stage and commit:
 git add Deployment/VersionTracker.md
 git commit -m "docs: update VersionTracker for release/<new-version>"
 ```
-
-## 7. Confirm merge to main and develop
-
-Ask the user:
-
-**Release branch `release/<new-version>` created successfully. Do you want to merge this release branch into `main` and `develop` now?**
-
-If the user says no: stop here and inform them the release branch is ready for manual merging when they are ready.
-If the user says yes: move to steps 8 and 9.
-
-## 8. Merge release branch into main and tag
-```
-git checkout main
-git merge --no-ff release/<new-version> -m "chore: merge release/<new-version> into main"
-git tag -a v<new-version> -m "Release version <new-version>"
-git checkout release/<new-version>
-```
-
-The tag uses the version number without the `release/` prefix, and is prefixed with `v` to follow common tagging conventions. This is to allow for easier rollbacks in the future.
-
-## 9. Merge release branch back into develop
-
-```
-git checkout develop
-git merge --no-ff release/<new-version> -m "chore: merge release/<new-version> back into develop"
-```
