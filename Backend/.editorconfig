@@ -171,3 +171,6 @@ indent_size = 2
 
 [*.md]
 trim_trailing_whitespace = false
+
+[**Tests.cs]
+dotnet_naming_rule.async_methods_should_end_with_async.severity = none

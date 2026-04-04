@@ -17,6 +17,21 @@ builder
     .Services
     .Configure<ApplicationInfo>(builder.Configuration.GetSection(ApplicationInfo.SectionName));
 
+var corsSection = builder.Configuration.GetSection(CorsOptions.SectionName);
+builder.Services.Configure<CorsOptions>(corsSection);
+
+builder.Services.AddCors(options =>
+{
+    var corsConfig = corsSection.Get<CorsOptions>() ?? new CorsOptions();
+
+    options.AddPolicy(CorsOptions.PolicyName, policy =>
+    {
+        policy.WithOrigins(corsConfig.AllowedOrigins)
+              .AllowAnyHeader()
+              .AllowAnyMethod();
+    });
+});
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -32,7 +47,10 @@ if (app.Environment.IsDevelopment())
 
 app.UseExceptionHandler();
 app.UseHttpsRedirection();
+app.UseCors(CorsOptions.PolicyName);
 app.MapControllers();
 app.MapHealthChecks("/health");
 
 app.Run();
+
+public partial class Program { }
