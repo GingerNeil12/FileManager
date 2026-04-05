@@ -3,7 +3,7 @@ name: test-writer-angular
 description: A skill to write tests for Angular applications.
 ---
 
-Write comprehensive Jasmine tests for the Angular code that was added or modified.
+Write comprehensive Vitest tests for the Angular code that was added or modified.
 
 ## 1. Discover what changed
 
@@ -56,8 +56,10 @@ For EACH scenario identified above, write a Jasmine test. No skipping.
 ### Mocking rules
 
 - Prefer `HttpClientTestingModule` over manual HTTP mocks for services.
-- Use Jasmine `spyOn` at system boundaries only: never spy on the service under test itself
-- Always ssert spy was called with expected arguments - `.toHaveBeenCalledWith(...)` not just `.toHaveBeenCalled()`.
+- Use `vi.spyOn` at system boundaries only: never spy on the service under test itself.
+- Use `vi.fn()` for standalone mock functions.
+- Always assert spy was called with expected arguments: `.toHaveBeenCalledWith(...)` not just `.toHaveBeenCalled()`.
+- Reset mocks between tests via `vi.clearAllMocks()` in `afterEach` to prevent state leakage.
 - Reset state between tests: no shared Observable subscriptions leaking across specs.
 
 ## File structure

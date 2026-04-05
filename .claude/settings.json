@@ -16,6 +16,10 @@
             "Bash(git stash *)",
             "Bash(git rev-parse *)",
             "Bash(git checkout *)",
+            "Bash(git pull *)",
+            "Bash(git add *)",
+            "Bash(git fetch *)",
+            "Bash(git switch *)",
             "Bash(dotnet build:*)",
             "Bash(dotnet run:*)",
             "Bash(dotnet test:*)",
@@ -45,10 +49,7 @@
             "Edit(**/.env.*)",
             "Edit(**/secrets/**)",
             "Edit(**/*.pem)",
-            "Edit(**/*.key)",
-            "Bash(git add *)",
-            "Bash(git fetch *)",
-            "Bash(git switch *)"
+            "Edit(**/*.key)"
         ]
     },
 

@@ -1,0 +1,36 @@
+<div class="d-flex justify-content-center align-items-center min-vh-100">
+  <div class="d-flex flex-row gap-3">
+    @for (service of services(); track service.name) {
+      <div
+        class="card border-2"
+        [class.bg-success]="isCardHealthy(service.healthStatus)"
+        [class.bg-danger]="!isCardHealthy(service.healthStatus)"
+        [class.border-success]="isCardHealthy(service.healthStatus)"
+        [class.border-danger]="!isCardHealthy(service.healthStatus)"
+        [class.bg-opacity-25]="true"
+      >
+        <div class="card-body">
+          <h5 class="card-title">{{ service.name }}</h5>
+          @if (isUnknown(service.version)) {
+            <p class="card-text text-muted">{{ service.version }}</p>
+          } @else {
+            <p class="card-text text-muted">v{{ service.version }}</p>
+          }
+          @if (service.healthStatus) {
+            <span
+              class="badge"
+              [class.bg-success]="isHealthy(service.healthStatus)"
+              [class.bg-danger]="!isHealthy(service.healthStatus)"
+            >
+              {{ service.healthStatus }}
+            </span>
+          }
+        </div>
+      </div>
+    }
+  </div>
+</div>
+
+@if (errorMessage()) {
+  <app-toast [message]="errorMessage()!" (dismissed)="handleToastDismissed()" />
+}
