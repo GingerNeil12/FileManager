@@ -6,9 +6,15 @@ import { vi } from 'vitest';
 
 import { NavbarComponent } from './navbar.component';
 
+const MOCK_USER = {
+  picture: 'https://example.com/avatar.png',
+  name: 'Test User',
+};
+
 function createMockAuthService(isAuthenticated: boolean) {
   return {
     isAuthenticated$: of(isAuthenticated),
+    user$: of(isAuthenticated ? MOCK_USER : null),
     loginWithRedirect: vi.fn(),
     logout: vi.fn(),
   };
@@ -183,14 +189,6 @@ describe('NavbarComponent', () => {
 
     afterEach(() => vi.clearAllMocks());
 
-    it('should render the Logout button', () => {
-      // Arrange / Act
-      const button = fixture.nativeElement.querySelector('button') as HTMLButtonElement;
-
-      // Assert
-      expect(button).toBeTruthy();
-    });
-
     it('should not render the Login button', () => {
       // Arrange / Act
       const buttons = fixture.nativeElement.querySelectorAll('button') as NodeListOf<HTMLButtonElement>;
@@ -200,48 +198,111 @@ describe('NavbarComponent', () => {
       expect(loginButton).toBeUndefined();
     });
 
-    it('should display "Logout" as the button label', () => {
-      // Arrange / Act
-      const button = fixture.nativeElement.querySelector('button') as HTMLButtonElement;
+    describe('avatar', () => {
+      it('should render the avatar image', () => {
+        // Arrange / Act
+        const img = fixture.nativeElement.querySelector('img') as HTMLImageElement;
 
-      // Assert
-      expect(button.textContent?.trim()).toBe('Logout');
+        // Assert
+        expect(img).toBeTruthy();
+      });
+
+      it('should set src to user.picture', () => {
+        // Arrange / Act
+        const img = fixture.nativeElement.querySelector('img') as HTMLImageElement;
+
+        // Assert
+        expect(img.src).toBe(MOCK_USER.picture);
+      });
+
+      it('should set alt to user.name', () => {
+        // Arrange / Act
+        const img = fixture.nativeElement.querySelector('img') as HTMLImageElement;
+
+        // Assert
+        expect(img.alt).toBe(MOCK_USER.name);
+      });
+
+      it('should apply rounded-circle class', () => {
+        // Arrange / Act
+        const img = fixture.nativeElement.querySelector('img') as HTMLImageElement;
+
+        // Assert
+        expect(img.classList).toContain('rounded-circle');
+      });
     });
 
-    it('should apply btn-outline-light class to the Logout button', () => {
-      // Arrange / Act
-      const button = fixture.nativeElement.querySelector('button') as HTMLButtonElement;
+    describe('dropdown menu', () => {
+      it('should not show the dropdown menu by default', () => {
+        // Arrange / Act
+        const menu = fixture.nativeElement.querySelector('.dropdown-menu') as HTMLElement;
 
-      // Assert
-      expect(button.classList).toContain('btn-outline-light');
-    });
+        // Assert
+        expect(menu.classList).not.toContain('show');
+      });
 
-    it('should apply btn-sm class to the Logout button', () => {
-      // Arrange / Act
-      const button = fixture.nativeElement.querySelector('button') as HTMLButtonElement;
+      it('should show the dropdown menu when avatar is clicked', () => {
+        // Arrange
+        const img = fixture.nativeElement.querySelector('img') as HTMLImageElement;
 
-      // Assert
-      expect(button.classList).toContain('btn-sm');
-    });
+        // Act
+        img.click();
+        fixture.detectChanges();
 
-    it('should set type="button" on the Logout button', () => {
-      // Arrange / Act
-      const button = fixture.nativeElement.querySelector('button') as HTMLButtonElement;
+        // Assert
+        const menu = fixture.nativeElement.querySelector('.dropdown-menu') as HTMLElement;
+        expect(menu.classList).toContain('show');
+      });
 
-      // Assert
-      expect(button.type).toBe('button');
-    });
+      it('should hide the dropdown menu when avatar is clicked again', () => {
+        // Arrange
+        const img = fixture.nativeElement.querySelector('img') as HTMLImageElement;
+        img.click();
+        fixture.detectChanges();
 
-    it('should call logout with returnTo window.location.origin when the Logout button is clicked', () => {
-      // Arrange
-      const button = fixture.nativeElement.querySelector('button') as HTMLButtonElement;
+        // Act
+        img.click();
+        fixture.detectChanges();
 
-      // Act
-      button.click();
+        // Assert
+        const menu = fixture.nativeElement.querySelector('.dropdown-menu') as HTMLElement;
+        expect(menu.classList).not.toContain('show');
+      });
 
-      // Assert
-      expect(mockAuthService.logout).toHaveBeenCalledWith({
-        logoutParams: { returnTo: window.location.origin },
+      it('should render a Logout option in the dropdown', () => {
+        // Arrange / Act
+        const item = fixture.nativeElement.querySelector('.dropdown-item') as HTMLButtonElement;
+
+        // Assert
+        expect(item.textContent?.trim()).toBe('Logout');
+      });
+
+      it('should call logout when Logout option is clicked', () => {
+        // Arrange
+        const item = fixture.nativeElement.querySelector('.dropdown-item') as HTMLButtonElement;
+
+        // Act
+        item.click();
+
+        // Assert
+        expect(mockAuthService.logout).toHaveBeenCalledWith({
+          logoutParams: { returnTo: window.location.origin },
+        });
+      });
+
+      it('should close the dropdown when clicking outside the navbar', () => {
+        // Arrange
+        const img = fixture.nativeElement.querySelector('img') as HTMLImageElement;
+        img.click();
+        fixture.detectChanges();
+
+        // Act
+        document.body.dispatchEvent(new MouseEvent('click', { bubbles: true }));
+        fixture.detectChanges();
+
+        // Assert
+        const menu = fixture.nativeElement.querySelector('.dropdown-menu') as HTMLElement;
+        expect(menu.classList).not.toContain('show');
       });
     });
   });
