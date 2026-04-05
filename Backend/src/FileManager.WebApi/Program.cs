@@ -1,5 +1,7 @@
 using FileManager.WebApi.Handlers;
 using FileManager.WebApi.Option;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
 using Scalar.AspNetCore;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -32,12 +34,33 @@ builder.Services.AddCors(options =>
     });
 });
 
+var auth0Section = builder.Configuration.GetSection(Auth0Options.SectionName);
+builder.Services.Configure<Auth0Options>(auth0Section);
+var auth0Config = auth0Section.Get<Auth0Options>() ?? new Auth0Options();
+
+builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+    .AddJwtBearer(options =>
+    {
+        options.Authority = $"https://{auth0Config.Domain}/";
+        options.Audience = auth0Config.Audience;
+    });
+
+builder.Services.AddAuthorization(options =>
+{
+    var requireAuth = new AuthorizationPolicyBuilder()
+        .RequireAuthenticatedUser()
+        .Build();
+
+    options.DefaultPolicy = requireAuth;
+    options.FallbackPolicy = requireAuth;
+});
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
-    app.MapOpenApi();
+    app.MapOpenApi().AllowAnonymous();
     app.MapScalarApiReference(options =>
     {
         options.DarkMode = true;
@@ -48,8 +71,10 @@ if (app.Environment.IsDevelopment())
 app.UseExceptionHandler();
 app.UseHttpsRedirection();
 app.UseCors(CorsOptions.PolicyName);
+app.UseAuthentication();
+app.UseAuthorization();
 app.MapControllers();
-app.MapHealthChecks("/health");
+app.MapHealthChecks("/health").AllowAnonymous();
 
 app.Run();
 
