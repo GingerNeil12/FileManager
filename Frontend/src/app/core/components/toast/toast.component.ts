@@ -5,6 +5,7 @@ import { ChangeDetectionStrategy, Component, input, output } from '@angular/core
   standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './toast.component.html',
+  styleUrl: './toast.component.css',
 })
 export class ToastComponent {
   readonly message = input.required<string>();
