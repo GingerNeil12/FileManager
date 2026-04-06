@@ -56,20 +56,20 @@ describe('NavbarComponent', () => {
         expect(nav).toBeTruthy();
       });
 
-      it('should apply navbar-dark class', () => {
+      it('should apply navbar-light class', () => {
         // Arrange / Act
         const nav = fixture.nativeElement.querySelector('nav') as HTMLElement;
 
         // Assert
-        expect(nav.classList).toContain('navbar-dark');
+        expect(nav.classList).toContain('navbar-light');
       });
 
-      it('should apply bg-dark class', () => {
+      it('should apply bg-light class', () => {
         // Arrange / Act
         const nav = fixture.nativeElement.querySelector('nav') as HTMLElement;
 
         // Assert
-        expect(nav.classList).toContain('bg-dark');
+        expect(nav.classList).toContain('bg-light');
       });
 
       it('should apply fixed-top class', () => {
@@ -90,12 +90,12 @@ describe('NavbarComponent', () => {
         expect(brand).toBeTruthy();
       });
 
-      it('should display FileManager as the brand text', () => {
+      it('should display File Manager as the brand text', () => {
         // Arrange / Act
         const brand = fixture.nativeElement.querySelector('a.navbar-brand') as HTMLAnchorElement;
 
         // Assert
-        expect(brand.textContent?.trim()).toBe('FileManager');
+        expect(brand.textContent?.trim()).toBe('File Manager');
       });
 
       it('should render the folder icon as an inline SVG', () => {
@@ -132,12 +132,12 @@ describe('NavbarComponent', () => {
       expect(button.textContent?.trim()).toBe('Login');
     });
 
-    it('should apply btn-outline-light class to the Login button', () => {
+    it('should apply btn-outline-dark class to the Login button', () => {
       // Arrange / Act
       const button = fixture.nativeElement.querySelector('button') as HTMLButtonElement;
 
       // Assert
-      expect(button.classList).toContain('btn-outline-light');
+      expect(button.classList).toContain('btn-outline-dark');
     });
 
     it('should apply btn-sm class to the Login button', () => {

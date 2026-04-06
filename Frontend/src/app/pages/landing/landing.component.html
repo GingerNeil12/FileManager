@@ -1,0 +1,55 @@
+<nav class="landing-nav">
+  <div class="container-fluid px-4">
+    <div class="d-flex align-items-center gap-2">
+      <ng-icon name="heroFolderOpenSolid" size="22" aria-hidden="true" />
+      <span class="landing-brand">FileManager</span>
+    </div>
+    <button class="btn landing-btn-outline btn-sm" type="button" (click)="handleLogin()">Log In</button>
+  </div>
+</nav>
+
+<section class="hero d-flex align-items-center justify-content-center text-center">
+  <div class="container">
+    <p class="hero-eyebrow mb-3">Secure Cloud Storage</p>
+    <h1 class="hero-headline mb-4">Your files. Secured.</h1>
+    <p class="hero-sub mb-5">
+      Store, organise and access your files with confidence.<br />
+      Built for people who care about privacy.
+    </p>
+    <button class="btn landing-btn-primary px-5 py-3" type="button" (click)="handleLogin()">
+      Get Started
+    </button>
+  </div>
+</section>
+
+<section class="features py-5">
+  <div class="container py-4">
+    <div class="row g-4 justify-content-center">
+      <div class="col-12 col-md-4">
+        <div class="feature-card text-center p-4">
+          <ng-icon name="heroCloudArrowUp" size="32" class="feature-icon mb-3" aria-hidden="true" />
+          <h3 class="feature-title mb-2">Upload</h3>
+          <p class="feature-desc">Drag-and-drop upload in seconds. Your files are encrypted the moment they arrive.</p>
+        </div>
+      </div>
+      <div class="col-12 col-md-4">
+        <div class="feature-card text-center p-4">
+          <ng-icon name="heroLink" size="32" class="feature-icon mb-3" aria-hidden="true" />
+          <h3 class="feature-title mb-2">Share</h3>
+          <p class="feature-desc">Share files with a single link. Control who can view, download or collaborate.</p>
+        </div>
+      </div>
+      <div class="col-12 col-md-4">
+        <div class="feature-card text-center p-4">
+          <ng-icon name="heroShieldCheck" size="32" class="feature-icon mb-3" aria-hidden="true" />
+          <h3 class="feature-title mb-2">Control</h3>
+          <p class="feature-desc">Granular permission controls. You decide exactly who has access to what.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer class="landing-footer py-4 text-center">
+  <p class="mb-0 footer-text">&copy; 2026 FileManager. All rights reserved.</p>
+</footer>
