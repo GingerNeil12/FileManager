@@ -5,14 +5,13 @@
 ### Backend (1.2.0)
 
 - Added Auth0 integration with Docker support
-- Added role guard and auth-error interceptor
+- Added current user support for accessing logged-in user info
 
 ### Frontend (1.2.0)
 
 - Added default navbar with Auth0 login/logout dropdown
 - Integrated Auth0 authentication
 - Added role guard and auth-error interceptor
-- Added current user support for accessing logged-in user info
 - Updated icons to use ng-icon
 - Added default landing page
 
