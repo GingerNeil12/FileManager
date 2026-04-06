@@ -6,7 +6,7 @@ declare const API_BASE_URL: string;
 export const environment = {
   production: true,
   appName: 'filemanager-frontend',
-  appVersion: '1.1.0',
+  appVersion: '1.2.0',
   apiBaseUrl: API_BASE_URL,
   auth0Domain: AUTH0_DOMAIN,
   auth0ClientId: AUTH0_CLIENT_ID,
