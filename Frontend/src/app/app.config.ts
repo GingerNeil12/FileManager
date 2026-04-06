@@ -5,6 +5,7 @@ import { authHttpInterceptorFn, provideAuth0 } from '@auth0/auth0-angular';
 
 import { environment } from '../environments/environment';
 import { routes } from './app.routes';
+import { authErrorInterceptor } from './core/interceptors/auth-error.interceptor';
 
 export const appConfig: ApplicationConfig = {
   providers: [
@@ -21,6 +22,6 @@ export const appConfig: ApplicationConfig = {
         allowedList: [`${environment.apiBaseUrl}/*`],
       },
     }),
-    provideHttpClient(withInterceptors([authHttpInterceptorFn])),
+    provideHttpClient(withInterceptors([authHttpInterceptorFn, authErrorInterceptor])),
   ],
 };

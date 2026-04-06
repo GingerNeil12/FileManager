@@ -1,7 +1,12 @@
+using FileManager.Application.Common.Interfaces;
 using FileManager.WebApi.Handlers;
 using FileManager.WebApi.Option;
+using FileManager.WebApi.Services;
+
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.IdentityModel.Tokens;
+
 using Scalar.AspNetCore;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -14,6 +19,11 @@ builder.Services.AddControllers();
 builder.Services.AddHealthChecks();
 builder.Services.AddProblemDetails();
 builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
+builder.Services.AddHttpContextAccessor();
+
+builder
+    .Services
+    .AddScoped<ICurrentUser, CurrentUser>();
 
 builder
     .Services
@@ -36,13 +46,18 @@ builder.Services.AddCors(options =>
 
 var auth0Section = builder.Configuration.GetSection(Auth0Options.SectionName);
 builder.Services.Configure<Auth0Options>(auth0Section);
-var auth0Config = auth0Section.Get<Auth0Options>() ?? new Auth0Options();
 
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(options =>
     {
+        var auth0Config = auth0Section.Get<Auth0Options>() ?? new Auth0Options();
+        
         options.Authority = $"https://{auth0Config.Domain}/";
         options.Audience = auth0Config.Audience;
+        options.TokenValidationParameters = new TokenValidationParameters
+        {
+            RoleClaimType = "http://localhost/roles"
+        };
     });
 
 builder.Services.AddAuthorization(options =>
