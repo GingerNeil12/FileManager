@@ -1,5 +1,23 @@
 # Version Tracker
 
+## release/1.2.0 - 2026-04-07
+
+### Backend (1.2.0)
+
+- Added Auth0 integration with Docker support
+- Added role guard and auth-error interceptor
+
+### Frontend (1.2.0)
+
+- Added default navbar with Auth0 login/logout dropdown
+- Integrated Auth0 authentication
+- Added role guard and auth-error interceptor
+- Added current user support for accessing logged-in user info
+- Updated icons to use ng-icon
+- Added default landing page
+
+---
+
 ## release/1.1.0 - 2026-04-05
 
 ### Backend (1.1.0)
