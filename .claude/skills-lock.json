@@ -1,0 +1,25 @@
+{
+  "version": 1,
+  "skills": {
+    "auth0-angular": {
+      "source": "auth0/agent-skills",
+      "sourceType": "github",
+      "computedHash": "c8711679dfb6f6b7aabaf6410b333563e83fb615877aff4dd73402bd62021fb2"
+    },
+    "auth0-aspnetcore-api": {
+      "source": "auth0/agent-skills",
+      "sourceType": "github",
+      "computedHash": "1ff0be625a306084ec4e84ca4d96c5008042e1ef5fab2c1ced8d3abf33b291e5"
+    },
+    "auth0-mfa": {
+      "source": "auth0/agent-skills",
+      "sourceType": "github",
+      "computedHash": "543694b00869afd0032c695e8bbac22e511c23f857f61b45f3d51698ee79b925"
+    },
+    "auth0-quickstart": {
+      "source": "auth0/agent-skills",
+      "sourceType": "github",
+      "computedHash": "67e192d297bae7cc25724fa4d5abf50c61e7265f563f594bf84071011d83e443"
+    }
+  }
+}

@@ -1,0 +1,27 @@
+<nav class="navbar navbar-light bg-light fixed-top border-bottom">
+  <div class="container-fluid">
+    <a class="navbar-brand" routerLink="/">
+      <ng-icon name="heroFolderOpenSolid" size="20" class="me-2" aria-hidden="true" />File Manager
+    </a>
+    @if (auth.user$ | async; as user) {
+      <div class="dropdown">
+        <img
+          [src]="user.picture"
+          [alt]="user.name"
+          class="rounded-circle"
+          width="32"
+          height="32"
+          role="button"
+          (click)="toggleMenu()"
+        />
+        <ul class="dropdown-menu dropdown-menu-end mt-1" [class.show]="isMenuOpen()" style="right: 0; left: auto;">
+          <li>
+            <button class="dropdown-item" type="button" (click)="logout()">Logout</button>
+          </li>
+        </ul>
+      </div>
+    } @else {
+      <button class="btn btn-outline-dark btn-sm" type="button" (click)="login()">Login</button>
+    }
+  </div>
+</nav>

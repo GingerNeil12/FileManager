@@ -1,0 +1,3 @@
+.toast-container {
+  top: var(--navbar-height);
+}
