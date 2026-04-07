@@ -31,7 +31,7 @@ We are looking to slowly start building out more functionality for users to be a
 ### Design decisions made during implementation
 
 | Decision | Detail |
-|---|---|
+| --- | --- |
 | Panel pushes content | Main area resizes via `margin-left` transition; not overlaid |
 | Submenu overlay | Uses `position: fixed` with `[style.left]` bound to active sidebar width CSS var |
 | Widths | 60px collapsed / 220px expanded (fixed px, not %) |
@@ -53,7 +53,7 @@ We are looking to slowly start building out more functionality for users to be a
 ## Files Created / Modified / Deleted
 
 | File | Action |
-|---|---|
+| --- | --- |
 | `Frontend/src/styles.css` | Modified — removed `body { padding-top }`, added CSS vars and layout classes |
 | `Frontend/src/app/app.ts` | Modified — OnPush, `toSignal` for auth, `isNavExpanded` signal, imports `NavPanelComponent` |
 | `Frontend/src/app/app.html` | Modified — flex shell, conditional nav panel, `margin-left` class bindings |
