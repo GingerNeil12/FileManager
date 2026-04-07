@@ -1,0 +1,53 @@
+<nav
+  class="nav-panel"
+  [class.nav-panel--expanded]="isExpanded()"
+  aria-label="Main navigation"
+>
+  <ul class="nav-panel__list">
+    <li class="nav-panel__item">
+      <button
+        class="nav-panel__btn"
+        type="button"
+        [class.nav-panel__btn--active]="isSettingsOpen()"
+        (click)="handleToggleSettings($event)"
+        [attr.aria-expanded]="isSettingsOpen()"
+        aria-haspopup="true"
+        title="Settings"
+      >
+        <ng-icon name="heroCog6Tooth" size="20" aria-hidden="true" />
+        @if (isExpanded()) {
+          <span class="nav-panel__label">Settings</span>
+        }
+      </button>
+
+      @if (isSettingsOpen()) {
+        <ul
+          class="nav-panel__submenu"
+          [style.left]="isExpanded() ? 'var(--sidebar-width-expanded)' : 'var(--sidebar-width-collapsed)'"
+          role="menu"
+        >
+          <li role="none">
+            <a class="nav-panel__submenu-item" routerLink="/version" role="menuitem">
+              Version
+            </a>
+          </li>
+        </ul>
+      }
+    </li>
+  </ul>
+
+  <div class="nav-panel__footer">
+    <button
+      class="nav-panel__toggle"
+      type="button"
+      (click)="handleToggleCollapse()"
+      [attr.aria-label]="isExpanded() ? 'Collapse navigation' : 'Expand navigation'"
+    >
+      @if (isExpanded()) {
+        <ng-icon name="heroChevronLeft" size="20" aria-hidden="true" />
+      } @else {
+        <ng-icon name="heroChevronRight" size="20" aria-hidden="true" />
+      }
+    </button>
+  </div>
+</nav>
