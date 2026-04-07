@@ -1,2 +1,14 @@
 <app-navbar />
-<router-outlet />
+
+<div class="app-shell">
+  @if (isAuthenticated()) {
+    <app-nav-panel [(isExpanded)]="isNavExpanded" />
+  }
+  <main
+    class="app-main"
+    [class.app-main--with-panel]="isAuthenticated()"
+    [class.app-main--expanded]="isAuthenticated() && isNavExpanded()"
+  >
+    <router-outlet />
+  </main>
+</div>
