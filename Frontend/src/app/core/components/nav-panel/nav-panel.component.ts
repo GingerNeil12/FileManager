@@ -28,6 +28,7 @@ export class NavPanelComponent implements OnInit {
   readonly isExpanded = model<boolean>(true);
 
   protected readonly isSettingsOpen = signal(false);
+  protected readonly submenuTop = signal(0);
 
   private readonly router = inject(Router);
   private readonly elementRef = inject(ElementRef);
@@ -55,6 +56,10 @@ export class NavPanelComponent implements OnInit {
 
   protected handleToggleSettings(event: MouseEvent): void {
     event.stopPropagation();
+    if (!this.isSettingsOpen()) {
+      const { top } = (event.currentTarget as HTMLElement).getBoundingClientRect();
+      this.submenuTop.set(top);
+    }
     this.isSettingsOpen.update((v) => !v);
   }
 }

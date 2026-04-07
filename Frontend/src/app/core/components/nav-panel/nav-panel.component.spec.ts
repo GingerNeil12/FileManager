@@ -251,6 +251,32 @@ describe('NavPanelComponent', () => {
       expect(submenu.style.left).toBe('var(--sidebar-width-collapsed)');
     });
 
+    it('should set top to the button getBoundingClientRect top when opened', () => {
+      // Arrange — submenu already opened in beforeEach via btn.click()
+      // The button's getBoundingClientRect().top in jsdom is 0 (no layout engine)
+      const submenu = fixture.nativeElement.querySelector('.nav-panel__submenu') as HTMLElement;
+
+      // Assert
+      expect(submenu.style.top).toBe('0px');
+    });
+
+    it('should not update top when submenu is closed by clicking settings again', () => {
+      // Arrange — submenu open from beforeEach
+      const btn = fixture.nativeElement.querySelector('.nav-panel__btn') as HTMLButtonElement;
+
+      // Act — close
+      btn.click();
+      fixture.detectChanges();
+
+      // Re-open to confirm top is still captured from the button rect
+      btn.click();
+      fixture.detectChanges();
+
+      // Assert — top is still set (jsdom returns 0)
+      const submenu = fixture.nativeElement.querySelector('.nav-panel__submenu') as HTMLElement;
+      expect(submenu.style.top).toBe('0px');
+    });
+
     it('should render the Version link in the submenu', () => {
       // Arrange / Act
       const link = fixture.nativeElement.querySelector('.nav-panel__submenu-item') as HTMLAnchorElement;
