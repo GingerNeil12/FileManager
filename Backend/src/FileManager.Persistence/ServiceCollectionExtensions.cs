@@ -1,4 +1,8 @@
 using Azure.Storage.Blobs;
+
+using FileManager.Application.Common.Interfaces;
+using FileManager.Persistence.Repositories;
+
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -28,6 +32,9 @@ public static class ServiceCollectionExtensions
 
                 return containerClient;
             });
+
+        services
+            .AddScoped<IApplicationUserRepository, ApplicationUserRepository>();
 
         return services;
     }

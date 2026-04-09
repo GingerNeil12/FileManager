@@ -1,4 +1,5 @@
 using System.Net.Mime;
+using FileManager.WebApi.Exceptions;
 using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
 
@@ -11,18 +12,34 @@ public class GlobalExceptionHandler(ILogger<GlobalExceptionHandler> logger) : IE
         Exception exception,
         CancellationToken cancellationToken)
     {
-        logger.LogError(exception, "Unhandled exception.");
-        var problemDetails = new ProblemDetails
-        {
-            Status = StatusCodes.Status500InternalServerError,
-            Title = "Internal Server Error",
-            Detail = "An unhandled error occured. Try again later.",
-            Type = "https://www.rfc-editor.org/rfc/rfc7231#section-6.6.1"
-        };
+        ProblemDetails problemDetails;
 
-        httpContext.Response.StatusCode = problemDetails.Status.Value;
-        httpContext.Response.ContentType = MediaTypeNames.Application.ProblemJson;
-        await httpContext.Response.WriteAsJsonAsync(problemDetails, cancellationToken: cancellationToken);
+        switch (exception)
+        {
+            case CurrentUserNotFoundException:
+                logger.LogWarning(exception, "Inconsistent state: authenticated user has no ApplicationUser record.");
+                problemDetails = new ProblemDetails
+                {
+                    Status = StatusCodes.Status401Unauthorized,
+                    Title = "Unauthorized",
+                    Detail = "User account not found.",
+                    Type = "https://www.rfc-editor.org/rfc/rfc7235#section-3.1"
+                };
+                break;
+            default:
+                logger.LogError(exception, "Unhandled exception.");
+                problemDetails = new ProblemDetails
+                {
+                    Status = StatusCodes.Status500InternalServerError,
+                    Title = "Internal Server Error",
+                    Detail = "An unhandled error occured. Try again later.",
+                    Type = "https://www.rfc-editor.org/rfc/rfc7231#section-6.6.1"
+                };
+                break;
+        }
+
+        httpContext.Response.StatusCode = problemDetails.Status!.Value;
+        await httpContext.Response.WriteAsJsonAsync(problemDetails, options: null, contentType: MediaTypeNames.Application.ProblemJson, cancellationToken: cancellationToken);
         return true;
     }
 }
