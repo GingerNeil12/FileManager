@@ -1,3 +1,4 @@
+using Azure.Storage.Blobs;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -14,6 +15,19 @@ public static class ServiceCollectionExtensions
         services
             .AddDbContext<ApplicationDbContext>(options =>
                 options.UseSqlServer(configuration.GetConnectionString("SqlServer")));
+
+        services
+            .AddSingleton(async () =>
+            {
+                var containerClient = new BlobContainerClient(
+                    configuration.GetConnectionString("BlobStorage"),
+                    configuration["Blob:ContainerName"]
+                );
+
+                await containerClient.CreateIfNotExistsAsync();
+
+                return containerClient;
+            });
 
         return services;
     }
