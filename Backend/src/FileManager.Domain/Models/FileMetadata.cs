@@ -10,6 +10,7 @@ public class FileMetadata
         string location,
         string originalName,
         long size,
+        string? description,
         bool isEncrypted,
         Guid uploadedById,
         DateTime uploadedOn,
@@ -20,6 +21,7 @@ public class FileMetadata
         Location = location;
         OriginalName = originalName;
         Size = size;
+        Description = description;
         IsEncrypted = isEncrypted;
         UploadedById = uploadedById;
         UploadedOn = uploadedOn;
@@ -30,6 +32,7 @@ public class FileMetadata
     public string Location { get; }
     public string OriginalName { get; }
     public long Size { get; }
+    public string? Description { get; set; }
     public bool IsEncrypted { get; }
     public Guid UploadedById { get; }
     public DateTime UploadedOn { get;  }
@@ -48,7 +51,8 @@ public class FileMetadata
         string originalName,
         long size,
         bool isEncrypted,
-        Guid uploadedById
+        Guid uploadedById,
+        string? description = default
     )
-        => new(Guid.NewGuid(), location, originalName, size, isEncrypted, uploadedById, DateTime.UtcNow, null);
+        => new(Guid.NewGuid(), location, originalName, size, description, isEncrypted, uploadedById, DateTime.UtcNow, null);
 }
