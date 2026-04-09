@@ -1,5 +1,22 @@
 # Version Tracker
 
+## release/1.3.0 - 2026-04-10
+
+### Backend (1.3.0)
+
+- Added base domain models and repository interfaces
+- Added DbContext with EF Core configurations and BlobContainerClient DI registration
+- Implemented FileMetadata repository with database integration
+- Implemented Blob repository with Azure Blob Storage integration
+- Updated GlobalExceptionHandler with additional test coverage
+
+### Frontend (1.3.0)
+
+- Added navpanel with submenu support
+- Updated version page
+
+---
+
 ## release/1.2.0 - 2026-04-07
 
 ### Backend (1.2.0)
