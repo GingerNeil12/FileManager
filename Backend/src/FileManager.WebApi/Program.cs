@@ -1,8 +1,9 @@
 using FileManager.Application.Common.Interfaces;
+using FileManager.Application;
+using FileManager.Persistence;
 using FileManager.WebApi.Handlers;
 using FileManager.WebApi.Option;
 using FileManager.WebApi.Services;
-
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.IdentityModel.Tokens;
@@ -20,6 +21,11 @@ builder.Services.AddHealthChecks();
 builder.Services.AddProblemDetails();
 builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
 builder.Services.AddHttpContextAccessor();
+
+builder
+    .Services
+    .AddApplication()
+    .AddPersistence(builder.Configuration);
 
 builder
     .Services
