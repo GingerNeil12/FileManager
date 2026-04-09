@@ -6,7 +6,8 @@ namespace FileManager.Application.Common.Interfaces;
 
 public interface ICurrentUser
 {
-    string GetUserId();
+    Guid GetUserId();
+    string GetExternalProviderId();
     string GetEmail();
     UserRoles GetRole();
     string GetName();

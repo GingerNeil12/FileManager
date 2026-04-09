@@ -1,9 +1,30 @@
 /* You can add global styles to this file, and also import other style files */
 @import 'bootstrap/dist/css/bootstrap.min.css';
+
 :root {
   --navbar-height: 56px;
+  --sidebar-width-expanded: 220px;
+  --sidebar-width-collapsed: 60px;
+  --sidebar-transition: 200ms ease-in-out;
 }
 
-body {
-  padding-top: var(--navbar-height);
+.app-shell {
+  display: flex;
+  flex-direction: row;
+  margin-top: var(--navbar-height);
+  min-height: calc(100vh - var(--navbar-height));
+}
+
+.app-main {
+  flex: 1;
+  min-width: 0;
+  transition: margin-left var(--sidebar-transition);
+}
+
+.app-main--with-panel {
+  margin-left: var(--sidebar-width-collapsed);
+}
+
+.app-main--with-panel.app-main--expanded {
+  margin-left: var(--sidebar-width-expanded);
 }
