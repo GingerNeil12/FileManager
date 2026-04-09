@@ -20,21 +20,22 @@ public static class ServiceCollectionExtensions
             .AddDbContext<ApplicationDbContext>(options =>
                 options.UseSqlServer(configuration.GetConnectionString("SqlServer")));
 
+        services.AddSingleton<BlobContainerClient>(_ =>
+        {
+            var containerClient = new BlobContainerClient(
+                configuration.GetConnectionString("BlobStorage"),
+                configuration["Blob:ContainerName"]
+            );
+
+            containerClient.CreateIfNotExists();
+
+            return containerClient;
+        });
+
         services
-            .AddSingleton(async () =>
-            {
-                var containerClient = new BlobContainerClient(
-                    configuration.GetConnectionString("BlobStorage"),
-                    configuration["Blob:ContainerName"]
-                );
-
-                await containerClient.CreateIfNotExistsAsync();
-
-                return containerClient;
-            });
-
-        services
-            .AddScoped<IApplicationUserRepository, ApplicationUserRepository>();
+            .AddScoped<IApplicationUserRepository, ApplicationUserRepository>()
+            .AddScoped<IFileMetadataRepository, FileMetadataRepository>()
+            .AddScoped<IBlobRepository, BlobRepository>();
 
         return services;
     }
