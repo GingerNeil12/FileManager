@@ -65,7 +65,7 @@ public class ApplicationUserRepositoryTests
     public async Task GetByAsync_WhenUserExists_ReturnsSuccess()
     {
         // Arrange
-        ApplicationUser user = ApplicationUser.Create("provider-id");
+        ApplicationUser user = ApplicationUser.Create("provider-id", "email", "given_name", "family_name", null);
         await SeedAsync(user);
 
         // Act
@@ -120,7 +120,7 @@ public class ApplicationUserRepositoryTests
     public async Task SaveAsync_WhenCalled_PersistsUser()
     {
         // Arrange
-        ApplicationUser user = ApplicationUser.Create("provider-id");
+        ApplicationUser user = ApplicationUser.Create("provider-id", "email", "given_name", "family_name", null);
 
         // Act
         await _sut.SaveAsync(user, CancellationToken.None);
@@ -136,7 +136,7 @@ public class ApplicationUserRepositoryTests
     {
         // Arrange
         ApplicationUserRepository sut = CreateSutWithDisposedContext();
-        ApplicationUser user = ApplicationUser.Create("provider-id");
+        ApplicationUser user = ApplicationUser.Create("provider-id", "email", "given_name", "family_name", null);
 
         // Act & Assert
         Assert.ThrowsAsync<ObjectDisposedException>(() =>
@@ -149,7 +149,7 @@ public class ApplicationUserRepositoryTests
         // Arrange
         ILogger<ApplicationUserRepository> mockLogger = Substitute.For<ILogger<ApplicationUserRepository>>();
         ApplicationUserRepository sut = CreateSutWithDisposedContext(mockLogger);
-        ApplicationUser user = ApplicationUser.Create("provider-id");
+        ApplicationUser user = ApplicationUser.Create("provider-id", "email", "given_name", "family_name", null);
 
         // Act
         Assert.ThrowsAsync<ObjectDisposedException>(() =>

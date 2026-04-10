@@ -65,7 +65,7 @@ public class FileMetadataRepositoryTests
     public async Task GetByAsync_WhenFileExists_ReturnsSuccess()
     {
         // Arrange
-        ApplicationUser user = ApplicationUser.Create("provider-id");
+        ApplicationUser user = ApplicationUser.Create("provider-id", "email", "given_name", "family_name", null);
         FileMetadata file = FileMetadata.Create("location/file.txt", "file.txt", 1024, false, user.Id);
         await SeedAsync(user, file);
 
@@ -95,7 +95,7 @@ public class FileMetadataRepositoryTests
     public async Task GetByAsync_WhenFileExists_IncludesUploadedBy()
     {
         // Arrange
-        ApplicationUser user = ApplicationUser.Create("provider-id");
+        ApplicationUser user = ApplicationUser.Create("provider-id", "email", "given_name", "family_name", null);
         FileMetadata file = FileMetadata.Create("location/file.txt", "file.txt", 1024, false, user.Id);
         await SeedAsync(user, file);
 
@@ -111,8 +111,8 @@ public class FileMetadataRepositoryTests
     public async Task GetByAsync_WhenFileHasAssignees_IncludesAssignees()
     {
         // Arrange
-        ApplicationUser uploader = ApplicationUser.Create("uploader-id");
-        ApplicationUser assignee = ApplicationUser.Create("assignee-id");
+        ApplicationUser uploader = ApplicationUser.Create("uploader-id", "email", "given_name", "family_name", null);
+        ApplicationUser assignee = ApplicationUser.Create("assignee-id", "email", "given_name", "family_name", null);
         FileMetadata file = FileMetadata.Create("location/file.txt", "file.txt", 1024, false, uploader.Id);
         FileMember member = FileMember.Create(file.Id, assignee.Id);
         _sharedDbContext.Users.Add(uploader);
@@ -135,7 +135,7 @@ public class FileMetadataRepositoryTests
     public async Task GetByAsync_WhenFileHasNoAssignees_ReturnsEmptyAssigneesList()
     {
         // Arrange
-        ApplicationUser user = ApplicationUser.Create("provider-id");
+        ApplicationUser user = ApplicationUser.Create("provider-id", "email", "given_name", "family_name", null);
         FileMetadata file = FileMetadata.Create("location/file.txt", "file.txt", 1024, false, user.Id);
         await SeedAsync(user, file);
 
@@ -177,7 +177,7 @@ public class FileMetadataRepositoryTests
     public async Task SaveAsync_WhenCalled_PersistsFileMetadata()
     {
         // Arrange
-        ApplicationUser user = ApplicationUser.Create("provider-id");
+        ApplicationUser user = ApplicationUser.Create("provider-id", "email", "given_name", "family_name", null);
         _sharedDbContext.Users.Add(user);
         await _sharedDbContext.SaveChangesAsync();
         _sharedDbContext.ChangeTracker.Clear();

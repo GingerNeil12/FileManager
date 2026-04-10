@@ -20,10 +20,10 @@ public class CurrentUserTests
     private IHttpContextAccessor _mockAccessor;
     private IApplicationUserRepository _mockRepo;
 
-    private const string ClaimsPrefix = "http://localhost/";
-    private const string EmailClaimType = $"{ClaimsPrefix}email";
-    private const string NameClaimType = $"{ClaimsPrefix}name";
-    private const string RolesClaimType = $"{ClaimsPrefix}roles";
+    private const string CLAIMS_PREFIX = "http://localhost/";
+    private const string EMAIL_CLAIM_TYPE = $"{CLAIMS_PREFIX}email";
+    private const string NAME_CLAIM_TYPE = $"{CLAIMS_PREFIX}name";
+    private const string ROLES_CLAIM_TYPE = $"{CLAIMS_PREFIX}roles";
 
     [SetUp]
     public void SetUp()
@@ -36,7 +36,7 @@ public class CurrentUserTests
     public void Constructor_WhenAllClaimsValidAndUserFound_SetsAllProperties()
     {
         // Arrange
-        ApplicationUser user = ApplicationUser.Create("auth0|12345");
+        ApplicationUser user = ApplicationUser.Create("auth0|12345", "email", "given_name", "family_name", null);
         SetupHttpContext(BuildValidClaims());
         SetupRepositorySuccess(user);
 
@@ -72,8 +72,8 @@ public class CurrentUserTests
     {
         // Arrange
         List<Claim> claims = BuildValidClaims()
-            .Where(c => c.Type != RolesClaimType)
-            .Append(new Claim(RolesClaimType, "NotAValidRole"))
+            .Where(c => c.Type != ROLES_CLAIM_TYPE)
+            .Append(new Claim(ROLES_CLAIM_TYPE, "NotAValidRole"))
             .ToList();
         SetupHttpContext(claims);
 
@@ -97,7 +97,7 @@ public class CurrentUserTests
     public void IsInRole_WhenChecked_ReturnsExpected(UserRoles roleToCheck, bool expected)
     {
         // Arrange
-        ApplicationUser user = ApplicationUser.Create("auth0|12345");
+        ApplicationUser user = ApplicationUser.Create("auth0|12345", "email", "given_name", "family_name", null);
         SetupHttpContext(BuildValidClaims());
         SetupRepositorySuccess(user);
         CurrentUser sut = new(_mockAccessor, _mockRepo);
@@ -111,22 +111,22 @@ public class CurrentUserTests
 
     private static IEnumerable<TestCaseData> MissingClaimCases()
     {
-        yield return new TestCaseData(EmailClaimType)
+        yield return new TestCaseData(EMAIL_CLAIM_TYPE)
             .SetName("Constructor_WhenEmailClaimMissing_Throws");
-        yield return new TestCaseData(NameClaimType)
+        yield return new TestCaseData(NAME_CLAIM_TYPE)
             .SetName("Constructor_WhenNameClaimMissing_Throws");
         yield return new TestCaseData(ClaimTypes.NameIdentifier)
             .SetName("Constructor_WhenNameIdentifierClaimMissing_Throws");
-        yield return new TestCaseData(RolesClaimType)
+        yield return new TestCaseData(ROLES_CLAIM_TYPE)
             .SetName("Constructor_WhenRolesClaimMissing_Throws");
     }
 
     private static List<Claim> BuildValidClaims() =>
     [
-        new Claim(EmailClaimType, "test@example.com"),
-        new Claim(NameClaimType, "Test User"),
+        new Claim(EMAIL_CLAIM_TYPE, "test@example.com"),
+        new Claim(NAME_CLAIM_TYPE, "Test User"),
         new Claim(ClaimTypes.NameIdentifier, "auth0|12345"),
-        new Claim(RolesClaimType, nameof(UserRoles.InternalAdmin))
+        new Claim(ROLES_CLAIM_TYPE, nameof(UserRoles.InternalAdmin))
     ];
 
     private void SetupHttpContext(IEnumerable<Claim> claims)
