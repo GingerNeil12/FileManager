@@ -25,6 +25,25 @@ internal class ApplicationUserConfiguration : IEntityTypeConfiguration<Applicati
         builder
             .HasIndex(x => x.ExternalProviderId)
             .IsUnique();
+        
+        builder
+            .Property(x => x.Email)
+            .HasMaxLength(512)
+            .IsRequired();
+
+        builder
+            .Property(x => x.GivenName)
+            .HasMaxLength(512)
+            .IsRequired();
+
+        builder
+            .Property(x => x.FamilyName)
+            .HasMaxLength(512)
+            .IsRequired();
+
+        builder
+            .Property(x => x.DepartmentId)
+            .IsRequired(false);
 
         builder
             .Property(x => x.CreatedOn)
@@ -41,5 +60,11 @@ internal class ApplicationUserConfiguration : IEntityTypeConfiguration<Applicati
             .WithOne(x => x.AssignedTo)
             .HasForeignKey(x => x.AssignedToId)
             .OnDelete(DeleteBehavior.NoAction);
+
+        builder
+            .HasOne(x => x.Department)
+            .WithMany(x => x.Members)
+            .HasForeignKey(x => x.DepartmentId)
+            .OnDelete(DeleteBehavior.Restrict);
     }
 }
