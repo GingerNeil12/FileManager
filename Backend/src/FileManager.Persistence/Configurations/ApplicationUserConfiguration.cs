@@ -40,6 +40,6 @@ internal class ApplicationUserConfiguration : IEntityTypeConfiguration<Applicati
             .HasMany(x => x.AssignedUploads)
             .WithOne(x => x.AssignedTo)
             .HasForeignKey(x => x.AssignedToId)
-            .OnDelete(DeleteBehavior.Cascade);
+            .OnDelete(DeleteBehavior.NoAction);
     }
 }
