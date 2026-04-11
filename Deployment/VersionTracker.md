@@ -1,5 +1,20 @@
 # Version Tracker
 
+## release/1.4.0 - 2026-04-12
+
+### Backend (1.4.0)
+
+- Added Auth0 management client with WireMock-based integration tests
+- Added Auth0 configuration support to Application layer
+- Added FileDepartment model and EF Core configuration
+- Added department controller skeleton and FileManagementController DTOs
+- Added CurrentUserMiddleware with LastLogin tracking and migration
+- Added authorize policies and role support to ApplicationUser
+- Added UpdateAsync to ApplicationUserRepository
+- Added UserBlockedException handling in GlobalExceptionHandler
+
+---
+
 ## release/1.3.0 - 2026-04-10
 
 ### Backend (1.3.0)
