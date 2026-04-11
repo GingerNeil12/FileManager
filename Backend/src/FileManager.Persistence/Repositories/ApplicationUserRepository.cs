@@ -44,4 +44,18 @@ public class ApplicationUserRepository(
             throw;
         }
     }
+
+    public async Task UpdateAsync(ApplicationUser user, CancellationToken ct)
+    {
+        try
+        {
+            context.Users.Update(user);
+            await context.SaveChangesAsync(ct);
+        }
+        catch (Exception ex)
+        {
+            logger.LogError(ex, "Unable to update user: {epi}.", user.ExternalProviderId);
+            throw;
+        }
+    }
 }

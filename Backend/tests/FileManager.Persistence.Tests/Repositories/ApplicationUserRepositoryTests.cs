@@ -160,6 +160,51 @@ public class ApplicationUserRepositoryTests
         AssertLoggedError(mockLogger);
     }
 
+    [Test]
+    public async Task UpdateAsync_WhenCalled_PersistsChanges()
+    {
+        // Arrange
+        ApplicationUser user = ApplicationUser.Create("provider-id", "email", "given_name", "family_name", UserRoles.ExternalUser, null);
+        await SeedAsync(user);
+        user.Disable();
+
+        // Act
+        await _sut.UpdateAsync(user, CancellationToken.None);
+
+        // Assert
+        ApplicationUser updated = await _sharedDbContext.Users.FindAsync(user.Id);
+        Assert.That(updated, Is.Not.Null);
+        Assert.That(updated.IsActive, Is.False);
+    }
+
+    [Test]
+    public void UpdateAsync_WhenExceptionOccurs_Rethrows()
+    {
+        // Arrange
+        ApplicationUserRepository sut = CreateSutWithDisposedContext();
+        ApplicationUser user = ApplicationUser.Create("provider-id", "email", "given_name", "family_name", UserRoles.ExternalUser, null);
+
+        // Act & Assert
+        Assert.ThrowsAsync<ObjectDisposedException>(() =>
+            sut.UpdateAsync(user, CancellationToken.None));
+    }
+
+    [Test]
+    public void UpdateAsync_WhenExceptionOccurs_LogsError()
+    {
+        // Arrange
+        ILogger<ApplicationUserRepository> mockLogger = Substitute.For<ILogger<ApplicationUserRepository>>();
+        ApplicationUserRepository sut = CreateSutWithDisposedContext(mockLogger);
+        ApplicationUser user = ApplicationUser.Create("provider-id", "email", "given_name", "family_name", UserRoles.ExternalUser, null);
+
+        // Act
+        Assert.ThrowsAsync<ObjectDisposedException>(() =>
+            sut.UpdateAsync(user, CancellationToken.None));
+
+        // Assert
+        AssertLoggedError(mockLogger);
+    }
+
     private async Task SeedAsync(ApplicationUser user)
     {
         _sharedDbContext.Users.Add(user);

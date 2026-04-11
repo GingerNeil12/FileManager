@@ -8,4 +8,5 @@ public interface IApplicationUserRepository
 {
     Task SaveAsync(ApplicationUser user, CancellationToken ct);
     Task<Result<ApplicationUser, Error>> GetByAsync(string externalProviderId, CancellationToken ct);
+    Task UpdateAsync(ApplicationUser user, CancellationToken ct);
 }
