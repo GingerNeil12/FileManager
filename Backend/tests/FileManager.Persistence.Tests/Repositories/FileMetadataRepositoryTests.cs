@@ -129,7 +129,7 @@ public class FileMetadataRepositoryTests
         // Assert
         Assert.That(result.IsSuccess, Is.True);
         Assert.That(result.Value.Assignees, Has.Count.EqualTo(1));
-        Assert.That(result.Value.Assignees[0].AssignedToId, Is.EqualTo(assignee.Id));
+        Assert.That(result.Value.Assignees.ElementAt(0).AssignedToId, Is.EqualTo(assignee.Id));
     }
 
     [Test]

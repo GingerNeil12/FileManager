@@ -25,7 +25,7 @@ public static class ServiceCollectionExtensions
                     .UseSeeding((_, _) => { }));
 
 
-        services.AddSingleton<BlobContainerClient>(_ =>
+        services.AddSingleton(_ =>
         {
             var containerClient = new BlobContainerClient(
                 configuration.GetConnectionString("BlobStorage"),
@@ -40,7 +40,8 @@ public static class ServiceCollectionExtensions
         services
             .AddScoped<IApplicationUserRepository, ApplicationUserRepository>()
             .AddScoped<IFileMetadataRepository, FileMetadataRepository>()
-            .AddScoped<IBlobRepository, BlobRepository>();
+            .AddScoped<IBlobRepository, BlobRepository>()
+            .AddScoped<IDepartmentRepository, DepartmentRepository>();
 
         return services;
     }
