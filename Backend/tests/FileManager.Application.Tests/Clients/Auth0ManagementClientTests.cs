@@ -1,7 +1,3 @@
-using System.Net;
-using System.Text;
-using System.Text.Json;
-
 using FileManager.Application.Clients;
 using FileManager.Application.Options;
 using FileManager.Domain.Common.Enums;
@@ -12,47 +8,60 @@ using Microsoft.Extensions.Options;
 
 using MsOptions = Microsoft.Extensions.Options.Options;
 
+using WireMock.RequestBuilders;
+using WireMock.ResponseBuilders;
+using WireMock.Server;
+
 namespace FileManager.Application.Tests.Clients;
 
 [TestFixture]
 public class Auth0ManagementClientTests
 {
-    private const string DOMAIN = "test.auth0.com";
     private const string CLIENT_ID = "test-client-id";
     private const string CLIENT_SECRET = "test-client-secret";
-    private const string MANAGEMENT_AUDIENCE = "https://test.auth0.com/api/v2/";
     private const string CONNECTION = "Username-Password-Authentication";
     private const string TEST_USER_ID = "auth0|test-user-123";
     private const string TEST_ROLE_ID = "rol_test-role-id";
     private const string TEST_ACCESS_TOKEN = "test-access-token";
 
-    private FakeHttpMessageHandler _handler = null!;
+    private WireMockServer _wireMockServer = null!;
     private IMemoryCache _cache = null!;
     private Auth0ManagementClient _sut = null!;
+
+    [OneTimeSetUp]
+    public void OneTimeSetUp()
+    {
+        _wireMockServer = WireMockServer.Start();
+    }
+
+    [OneTimeTearDown]
+    public void OneTimeTearDown()
+    {
+        _wireMockServer.Dispose();
+    }
 
     [SetUp]
     public void SetUp()
     {
-        _handler = new FakeHttpMessageHandler();
-        var httpClient = new HttpClient(_handler);
+        _wireMockServer.Reset();
         _cache = new MemoryCache(new MemoryCacheOptions());
 
         IOptions<Auth0ManagementOptions> options = MsOptions.Create(new Auth0ManagementOptions
         {
-            Domain = DOMAIN,
+            Scheme = "http",
+            Domain = _wireMockServer.Urls[0].Replace("http://", string.Empty),
             ClientId = CLIENT_ID,
             ClientSecret = CLIENT_SECRET,
-            Audience = MANAGEMENT_AUDIENCE,
+            Audience = $"{_wireMockServer.Urls[0]}/api/v2/",
             Connection = CONNECTION
         });
 
-        _sut = new Auth0ManagementClient(httpClient, options, _cache);
+        _sut = new Auth0ManagementClient(new HttpClient(), options, _cache);
     }
 
     [TearDown]
     public void TearDown()
     {
-        _handler.Dispose();
         _cache.Dispose();
     }
 
@@ -60,7 +69,9 @@ public class Auth0ManagementClientTests
     public async Task CreateUserAsync_WhenTokenFetchFails_ReturnsExternalServiceError()
     {
         // Arrange
-        _handler.EnqueueResponse(new HttpResponseMessage(HttpStatusCode.Unauthorized));
+        _wireMockServer
+            .Given(Request.Create().WithPath("/oauth/token").UsingPost())
+            .RespondWith(Response.Create().WithStatusCode(401));
 
         // Act
         var result = await _sut.CreateUserAsync("Jane", "Doe", "jane@example.com", UserRoles.InternalUser, CancellationToken.None);
@@ -74,8 +85,10 @@ public class Auth0ManagementClientTests
     public async Task CreateUserAsync_WhenUserCreationFails_ReturnsExternalServiceError()
     {
         // Arrange
-        _handler.EnqueueResponse(BuildTokenResponse());
-        _handler.EnqueueResponse(new HttpResponseMessage(HttpStatusCode.BadRequest));
+        StubTokenEndpoint();
+        _wireMockServer
+            .Given(Request.Create().WithPath("/api/v2/users").UsingPost())
+            .RespondWith(Response.Create().WithStatusCode(400));
 
         // Act
         var result = await _sut.CreateUserAsync("Jane", "Doe", "jane@example.com", UserRoles.InternalUser, CancellationToken.None);
@@ -89,9 +102,11 @@ public class Auth0ManagementClientTests
     public async Task CreateUserAsync_WhenRoleLookupFails_ReturnsExternalServiceError()
     {
         // Arrange
-        _handler.EnqueueResponse(BuildTokenResponse());
-        _handler.EnqueueResponse(BuildCreateUserResponse());
-        _handler.EnqueueResponse(new HttpResponseMessage(HttpStatusCode.InternalServerError));
+        StubTokenEndpoint();
+        StubCreateUserEndpoint();
+        _wireMockServer
+            .Given(Request.Create().WithPath("/api/v2/roles").UsingGet())
+            .RespondWith(Response.Create().WithStatusCode(500));
 
         // Act
         var result = await _sut.CreateUserAsync("Jane", "Doe", "jane@example.com", UserRoles.InternalUser, CancellationToken.None);
@@ -105,9 +120,13 @@ public class Auth0ManagementClientTests
     public async Task CreateUserAsync_WhenRoleLookupReturnsNoMatch_ReturnsExternalServiceError()
     {
         // Arrange
-        _handler.EnqueueResponse(BuildTokenResponse());
-        _handler.EnqueueResponse(BuildCreateUserResponse());
-        _handler.EnqueueResponse(BuildRolesResponse([]));
+        StubTokenEndpoint();
+        StubCreateUserEndpoint();
+        _wireMockServer
+            .Given(Request.Create().WithPath("/api/v2/roles").UsingGet())
+            .RespondWith(Response.Create()
+                .WithStatusCode(200)
+                .WithBodyAsJson(Array.Empty<object>()));
 
         // Act
         var result = await _sut.CreateUserAsync("Jane", "Doe", "jane@example.com", UserRoles.InternalUser, CancellationToken.None);
@@ -121,10 +140,12 @@ public class Auth0ManagementClientTests
     public async Task CreateUserAsync_WhenRoleAssignmentFails_ReturnsExternalServiceError()
     {
         // Arrange
-        _handler.EnqueueResponse(BuildTokenResponse());
-        _handler.EnqueueResponse(BuildCreateUserResponse());
-        _handler.EnqueueResponse(BuildRolesResponse([new RoleEntry(TEST_ROLE_ID, "InternalUser")]));
-        _handler.EnqueueResponse(new HttpResponseMessage(HttpStatusCode.Forbidden));
+        StubTokenEndpoint();
+        StubCreateUserEndpoint();
+        StubRoleLookupEndpoint();
+        _wireMockServer
+            .Given(Request.Create().WithPath($"/api/v2/users/{TEST_USER_ID}/roles").UsingPost())
+            .RespondWith(Response.Create().WithStatusCode(403));
 
         // Act
         var result = await _sut.CreateUserAsync("Jane", "Doe", "jane@example.com", UserRoles.InternalUser, CancellationToken.None);
@@ -138,10 +159,10 @@ public class Auth0ManagementClientTests
     public async Task CreateUserAsync_WhenAllCallsSucceed_ReturnsUserId()
     {
         // Arrange
-        _handler.EnqueueResponse(BuildTokenResponse());
-        _handler.EnqueueResponse(BuildCreateUserResponse());
-        _handler.EnqueueResponse(BuildRolesResponse([new RoleEntry(TEST_ROLE_ID, "InternalUser")]));
-        _handler.EnqueueResponse(new HttpResponseMessage(HttpStatusCode.NoContent));
+        StubTokenEndpoint();
+        StubCreateUserEndpoint();
+        StubRoleLookupEndpoint();
+        StubAssignRoleEndpoint();
 
         // Act
         var result = await _sut.CreateUserAsync("Jane", "Doe", "jane@example.com", UserRoles.InternalUser, CancellationToken.None);
@@ -154,76 +175,65 @@ public class Auth0ManagementClientTests
     [Test]
     public async Task CreateUserAsync_WhenCalledTwice_FetchesTokenOnce()
     {
-        // Arrange — one token response for two full call sequences
-        _handler.EnqueueResponse(BuildTokenResponse());
-        _handler.EnqueueResponse(BuildCreateUserResponse());
-        _handler.EnqueueResponse(BuildRolesResponse([new RoleEntry(TEST_ROLE_ID, "InternalUser")]));
-        _handler.EnqueueResponse(new HttpResponseMessage(HttpStatusCode.NoContent));
-        _handler.EnqueueResponse(BuildCreateUserResponse());
-        _handler.EnqueueResponse(BuildRolesResponse([new RoleEntry(TEST_ROLE_ID, "InternalUser")]));
-        _handler.EnqueueResponse(new HttpResponseMessage(HttpStatusCode.NoContent));
+        // Arrange
+        StubTokenEndpoint();
+        StubCreateUserEndpoint();
+        StubRoleLookupEndpoint();
+        StubAssignRoleEndpoint();
 
         // Act
         var firstResult = await _sut.CreateUserAsync("Jane", "Doe", "jane@example.com", UserRoles.InternalUser, CancellationToken.None);
         var secondResult = await _sut.CreateUserAsync("John", "Smith", "john@example.com", UserRoles.InternalUser, CancellationToken.None);
 
-        // Assert — both succeed, meaning the second call reused the cached token
+        // Assert
         Assert.That(firstResult.IsSuccess, Is.True);
         Assert.That(secondResult.IsSuccess, Is.True);
-        Assert.That(_handler.RequestCount, Is.EqualTo(7));
+
+        int tokenRequests = _wireMockServer.LogEntries
+            .Count(e => e.RequestMessage.Path == "/oauth/token");
+        Assert.That(tokenRequests, Is.EqualTo(1));
     }
 
-    private static HttpResponseMessage BuildTokenResponse()
+    private void StubTokenEndpoint()
     {
-        var body = JsonSerializer.Serialize(new
-        {
-            access_token = TEST_ACCESS_TOKEN,
-            expires_in = 86400
-        });
-        return new HttpResponseMessage(HttpStatusCode.OK)
-        {
-            Content = new StringContent(body, Encoding.UTF8, "application/json")
-        };
+        _wireMockServer
+            .Given(Request.Create().WithPath("/oauth/token").UsingPost())
+            .RespondWith(Response.Create()
+                .WithStatusCode(200)
+                .WithBodyAsJson(new { access_token = TEST_ACCESS_TOKEN, expires_in = 86400 }));
     }
 
-    private static HttpResponseMessage BuildCreateUserResponse()
+    private void StubCreateUserEndpoint()
     {
-        var body = JsonSerializer.Serialize(new { user_id = TEST_USER_ID });
-        return new HttpResponseMessage(HttpStatusCode.Created)
-        {
-            Content = new StringContent(body, Encoding.UTF8, "application/json")
-        };
+        _wireMockServer
+            .Given(Request.Create()
+                .WithPath("/api/v2/users")
+                .UsingPost()
+                .WithHeader("Authorization", $"Bearer {TEST_ACCESS_TOKEN}"))
+            .RespondWith(Response.Create()
+                .WithStatusCode(201)
+                .WithBodyAsJson(new { user_id = TEST_USER_ID }));
     }
 
-    private static HttpResponseMessage BuildRolesResponse(RoleEntry[] roles)
+    private void StubRoleLookupEndpoint()
     {
-        var body = JsonSerializer.Serialize(roles.Select(r => new { id = r.Id, name = r.Name }));
-        return new HttpResponseMessage(HttpStatusCode.OK)
-        {
-            Content = new StringContent(body, Encoding.UTF8, "application/json")
-        };
+        _wireMockServer
+            .Given(Request.Create()
+                .WithPath("/api/v2/roles")
+                .UsingGet()
+                .WithHeader("Authorization", $"Bearer {TEST_ACCESS_TOKEN}"))
+            .RespondWith(Response.Create()
+                .WithStatusCode(200)
+                .WithBodyAsJson(new[] { new { id = TEST_ROLE_ID, name = "InternalUser" } }));
     }
 
-    private sealed record RoleEntry(string Id, string Name);
-}
-
-internal class FakeHttpMessageHandler : HttpMessageHandler
-{
-    private readonly Queue<HttpResponseMessage> _responses = new();
-
-    public int RequestCount { get; private set; }
-
-    public void EnqueueResponse(HttpResponseMessage response) => _responses.Enqueue(response);
-
-    protected override Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken)
+    private void StubAssignRoleEndpoint()
     {
-        RequestCount++;
-
-        if (_responses.Count == 0)
-        {
-            throw new InvalidOperationException("No more HTTP responses queued.");
-        }
-
-        return Task.FromResult(_responses.Dequeue());
+        _wireMockServer
+            .Given(Request.Create()
+                .WithPath($"/api/v2/users/{TEST_USER_ID}/roles")
+                .UsingPost()
+                .WithHeader("Authorization", $"Bearer {TEST_ACCESS_TOKEN}"))
+            .RespondWith(Response.Create().WithStatusCode(204));
     }
 }

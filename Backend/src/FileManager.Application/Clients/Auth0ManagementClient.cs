@@ -78,7 +78,7 @@ public class Auth0ManagementClient(
         };
 
         using HttpResponseMessage response = await httpClient.PostAsJsonAsync(
-            $"https://{_options.Domain}/oauth/token",
+            $"{_options.Scheme}://{_options.Domain}/oauth/token",
             requestBody,
             ct);
 
@@ -108,7 +108,7 @@ public class Auth0ManagementClient(
     {
         using HttpRequestMessage request = CreateAuthorizedRequest(
             HttpMethod.Post,
-            $"https://{_options.Domain}/api/v2/users",
+            $"{_options.Scheme}://{_options.Domain}/api/v2/users",
             token);
 
         request.Content = JsonContent.Create(new
@@ -145,7 +145,7 @@ public class Auth0ManagementClient(
 
         using HttpRequestMessage request = CreateAuthorizedRequest(
             HttpMethod.Get,
-            $"https://{_options.Domain}/api/v2/roles?name_filter={Uri.EscapeDataString(roleName)}",
+            $"{_options.Scheme}://{_options.Domain}/api/v2/roles?name_filter={Uri.EscapeDataString(roleName)}",
             token);
 
         using HttpResponseMessage response = await httpClient.SendAsync(request, ct);
@@ -174,7 +174,7 @@ public class Auth0ManagementClient(
     {
         using HttpRequestMessage request = CreateAuthorizedRequest(
             HttpMethod.Post,
-            $"https://{_options.Domain}/api/v2/users/{Uri.EscapeDataString(userId)}/roles",
+            $"{_options.Scheme}://{_options.Domain}/api/v2/users/{Uri.EscapeDataString(userId)}/roles",
             token);
 
         request.Content = JsonContent.Create(new { roles = new[] { roleId } });
