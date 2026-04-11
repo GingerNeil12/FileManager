@@ -13,7 +13,8 @@ public class ApplicationUser
         bool isActive,
         UserRoles role,
         int? departmentId,
-        DateTime createdOn
+        DateTime createdOn,
+        DateTime? lastLogin
     )
     {
         Id = id;
@@ -25,6 +26,7 @@ public class ApplicationUser
         Role = role;
         DepartmentId = departmentId;
         CreatedOn = createdOn;
+        LastLogin = lastLogin;
     }
 
     public Guid Id { get; }
@@ -34,8 +36,9 @@ public class ApplicationUser
     public string FamilyName { get; private set; }
     public bool IsActive { get; private set; }
     public UserRoles Role { get; private set; }
-    public int? DepartmentId { get; }
+    public int? DepartmentId { get; private set; }
     public DateTime CreatedOn { get; }
+    public DateTime? LastLogin { get; private set; }
 
     public virtual Department? Department { get; }
     public virtual ICollection<FileMetadata> Uploads { get; set; } = [];
@@ -48,7 +51,7 @@ public class ApplicationUser
         string familyName,
         UserRoles role,
         int? departmentId)
-        => new(Guid.NewGuid(), externalProviderId, email, givenName, familyName, true, role, departmentId, DateTime.UtcNow);
+        => new(Guid.NewGuid(), externalProviderId, email, givenName, familyName, true, role, departmentId, DateTime.UtcNow, null);
 
     public void Disable() => IsActive = false;
     public void Enable() => IsActive = true;
@@ -60,4 +63,6 @@ public class ApplicationUser
         FamilyName = value;
     }
     public void ChangeRole(UserRoles role) => Role = role;
-}
+    public void AddDepartment(int departmentId) => DepartmentId = departmentId;
+    public void LoggedIn() => LastLogin = DateTime.UtcNow;
+} 

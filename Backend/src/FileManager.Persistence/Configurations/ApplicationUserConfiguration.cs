@@ -58,6 +58,10 @@ internal class ApplicationUserConfiguration : IEntityTypeConfiguration<Applicati
         builder
             .Property(x => x.CreatedOn)
             .IsRequired();
+
+        builder
+            .Property(x => x.LastLogin)
+            .IsRequired(false);
         
         builder
             .HasMany(x => x.Uploads)
