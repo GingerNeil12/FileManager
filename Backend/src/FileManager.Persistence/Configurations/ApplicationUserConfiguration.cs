@@ -1,7 +1,9 @@
+using FileManager.Domain.Common.Enums;
 using FileManager.Domain.Models;
 
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
+using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace FileManager.Persistence.Configurations;
 
@@ -44,6 +46,14 @@ internal class ApplicationUserConfiguration : IEntityTypeConfiguration<Applicati
         builder
             .Property(x => x.DepartmentId)
             .IsRequired(false);
+
+        builder
+            .Property(x => x.IsActive)
+            .IsRequired();
+
+        builder
+            .Property(x => x.Role)
+            .HasConversion<EnumToStringConverter<UserRoles>>();
 
         builder
             .Property(x => x.CreatedOn)
