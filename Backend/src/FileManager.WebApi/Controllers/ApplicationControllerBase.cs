@@ -42,6 +42,7 @@ public abstract class ApplicationControllerBase : ControllerBase
                     Type = "https://www.rfc-editor.org/rfc/rfc7231#section-6.5.3"
                 };
                 return StatusCode(StatusCodes.Status403Forbidden, forbiddenProblemDetails);
+            case ExternalServiceError:
             default:
                 var problemDetails = new ProblemDetails
                 {

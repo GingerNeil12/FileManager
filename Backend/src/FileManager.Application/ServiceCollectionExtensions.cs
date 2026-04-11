@@ -1,3 +1,6 @@
+using FileManager.Application.Clients;
+using FileManager.Application.Common.Interfaces;
+using FileManager.Application.Options;
 using FileManager.Application.Workflows.CreateUser;
 
 using FluentValidation;
@@ -14,7 +17,13 @@ public static class ServiceCollectionExtensions
         IConfiguration configuration)
     {
         services.AddValidatorsFromAssembly(typeof(ServiceCollectionExtensions).Assembly);
-        
+
+        services.Configure<Auth0ManagementOptions>(
+            configuration.GetSection(Auth0ManagementOptions.SectionName));
+
+        services.AddMemoryCache();
+        services.AddHttpClient<IAuth0ManagementClient, Auth0ManagementClient>();
+
         services
             .AddScoped<ICreateUserService, CreateUserService>();
 
