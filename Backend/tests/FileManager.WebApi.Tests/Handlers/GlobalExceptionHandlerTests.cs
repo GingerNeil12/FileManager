@@ -42,7 +42,28 @@ public class GlobalExceptionHandlerTests
             Assert.That(httpContext.Response.StatusCode, Is.EqualTo(StatusCodes.Status401Unauthorized));
             Assert.That(problemDetails!.Status, Is.EqualTo(StatusCodes.Status401Unauthorized));
             Assert.That(problemDetails.Title, Is.EqualTo("Unauthorized"));
-            Assert.That(problemDetails.Detail, Is.EqualTo("User account not found."));
+            Assert.That(problemDetails.Detail, Is.EqualTo("Access is unauthorized."));
+        }
+    }
+
+    [Test]
+    public async Task TryHandleAsync_WhenUserBlockedException_Returns401WithProblemDetails()
+    {
+        // Arrange
+        DefaultHttpContext httpContext = BuildHttpContext();
+        var exception = new UserBlockedException("auth0|12345");
+
+        // Act
+        await _sut.TryHandleAsync(httpContext, exception, CancellationToken.None);
+
+        // Assert
+        ProblemDetails? problemDetails = await ReadProblemDetails(httpContext.Response);
+        using (Assert.EnterMultipleScope())
+        {
+            Assert.That(httpContext.Response.StatusCode, Is.EqualTo(StatusCodes.Status401Unauthorized));
+            Assert.That(problemDetails!.Status, Is.EqualTo(StatusCodes.Status401Unauthorized));
+            Assert.That(problemDetails.Title, Is.EqualTo("Unauthorized"));
+            Assert.That(problemDetails.Detail, Is.EqualTo("Access is unauthorized."));
         }
     }
 
@@ -82,6 +103,20 @@ public class GlobalExceptionHandlerTests
     }
 
     [Test]
+    public async Task TryHandleAsync_WhenUserBlockedException_LogsWarning()
+    {
+        // Arrange
+        DefaultHttpContext httpContext = BuildHttpContext();
+        var exception = new UserBlockedException("auth0|12345");
+
+        // Act
+        await _sut.TryHandleAsync(httpContext, exception, CancellationToken.None);
+
+        // Assert
+        AssertLogged(LogLevel.Warning);
+    }
+
+    [Test]
     public async Task TryHandleAsync_WhenUnhandledException_LogsError()
     {
         // Arrange
@@ -101,6 +136,20 @@ public class GlobalExceptionHandlerTests
         // Arrange
         DefaultHttpContext httpContext = BuildHttpContext();
         var exception = new CurrentUserNotFoundException("auth0|12345");
+
+        // Act
+        await _sut.TryHandleAsync(httpContext, exception, CancellationToken.None);
+
+        // Assert
+        Assert.That(httpContext.Response.ContentType, Does.Contain(MediaTypeNames.Application.ProblemJson));
+    }
+
+    [Test]
+    public async Task TryHandleAsync_WhenUserBlockedException_SetsProblemJsonContentType()
+    {
+        // Arrange
+        DefaultHttpContext httpContext = BuildHttpContext();
+        var exception = new UserBlockedException("auth0|12345");
 
         // Act
         await _sut.TryHandleAsync(httpContext, exception, CancellationToken.None);

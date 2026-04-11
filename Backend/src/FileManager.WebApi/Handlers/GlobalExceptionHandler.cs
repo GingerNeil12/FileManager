@@ -16,13 +16,14 @@ public class GlobalExceptionHandler(ILogger<GlobalExceptionHandler> logger) : IE
 
         switch (exception)
         {
+            case UserBlockedException:
             case CurrentUserNotFoundException:
-                logger.LogWarning(exception, "Inconsistent state: authenticated user has no ApplicationUser record.");
+                logger.LogWarning(exception, "User is not found or blobked.");
                 problemDetails = new ProblemDetails
                 {
                     Status = StatusCodes.Status401Unauthorized,
                     Title = "Unauthorized",
-                    Detail = "User account not found.",
+                    Detail = "Access is unauthorized.",
                     Type = "https://www.rfc-editor.org/rfc/rfc7235#section-3.1"
                 };
                 break;

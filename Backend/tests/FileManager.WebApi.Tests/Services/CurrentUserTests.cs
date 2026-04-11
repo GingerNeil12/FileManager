@@ -92,6 +92,19 @@ public class CurrentUserTests
         Assert.Throws<CurrentUserNotFoundException>(() => new CurrentUser(_mockAccessor, _mockRepo));
     }
 
+    [Test]
+    public void Constructor_WhenUserIsBlocked_ThrowsUserBlockedException()
+    {
+        // Arrange
+        ApplicationUser user = ApplicationUser.Create("auth0|12345", "email", "given_name", "family_name", UserRoles.ExternalUser, null);
+        user.Disable();
+        SetupHttpContext(BuildValidClaims());
+        SetupRepositorySuccess(user);
+
+        // Act & Assert
+        Assert.Throws<UserBlockedException>(() => new CurrentUser(_mockAccessor, _mockRepo));
+    }
+
     [TestCase(UserRoles.InternalAdmin, true)]
     [TestCase(UserRoles.InternalUser, false)]
     public void IsInRole_WhenChecked_ReturnsExpected(UserRoles roleToCheck, bool expected)

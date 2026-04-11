@@ -39,6 +39,11 @@ public class CurrentUser : ICurrentUser
             throw new CurrentUserNotFoundException(_externalProviderId);
         }
 
+        if (!userResult.Value!.IsActive)
+        {
+            throw new UserBlockedException(_externalProviderId);
+        }
+
         _userId = userResult.Value!.Id;
     }
 
