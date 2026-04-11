@@ -38,7 +38,8 @@ public class FileMetadata
     public DateTime UploadedOn { get;  }
     public DateTime? RemovedOn { get; set; }
 
-    public virtual IList<FileMember> Assignees { get; set; } = [];
+    public virtual ICollection<FileMember> Assignees { get; set; } = [];
+    public virtual ICollection<FileDepartment> Departments { get; set; } = [];
 
     public virtual ApplicationUser UploadedBy
     {

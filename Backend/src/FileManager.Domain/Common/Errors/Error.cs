@@ -11,5 +11,6 @@ public enum ErrorType
     Validation,
     NotFound,
     Forbidden,
-    Conflict
+    Conflict,
+    ExternalService
 }

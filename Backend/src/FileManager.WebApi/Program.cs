@@ -1,11 +1,16 @@
-using FileManager.Application.Common.Interfaces;
 using FileManager.Application;
+using FileManager.Application.Common.Interfaces;
+using FileManager.Domain.Common.Enums;
 using FileManager.Persistence;
+using FileManager.WebApi;
 using FileManager.WebApi.Handlers;
+using FileManager.WebApi.Middleware;
 using FileManager.WebApi.Option;
 using FileManager.WebApi.Services;
+
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 
 using Scalar.AspNetCore;
@@ -24,11 +29,12 @@ builder.Services.AddHttpContextAccessor();
 
 builder
     .Services
-    .AddApplication()
+    .AddApplication(builder.Configuration)
     .AddPersistence(builder.Configuration);
 
 builder
     .Services
+    .AddSingleton(TimeProvider.System)
     .AddScoped<ICurrentUser, CurrentUser>();
 
 builder
@@ -49,6 +55,21 @@ builder.Services.AddCors(options =>
               .AllowAnyMethod();
     });
 });
+
+builder
+    .Services
+    .AddAuthorizationBuilder()
+    .AddPolicy(ApplicationConstants.INTERNAL_ONLY_POLICY, options =>
+    {
+        options.RequireRole(
+            UserRoles.InternalAdmin.ToString(),
+            UserRoles.InternalUser.ToString()
+        );
+    })
+    .AddPolicy(ApplicationConstants.ADMIN_ONLY_POLICY, options =>
+    {
+        options.RequireRole(UserRoles.InternalAdmin.ToString());
+    });
 
 var auth0Section = builder.Configuration.GetSection(Auth0Options.SectionName);
 builder.Services.Configure<Auth0Options>(auth0Section);
@@ -78,6 +99,13 @@ builder.Services.AddAuthorization(options =>
 
 var app = builder.Build();
 
+if (!string.IsNullOrEmpty(builder.Configuration.GetConnectionString("SqlServer")))
+{
+    using var scope = app.Services.CreateScope();
+    var db = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+    await db.Database.MigrateAsync();
+}
+
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
@@ -86,7 +114,8 @@ if (app.Environment.IsDevelopment())
     {
         options.DarkMode = true;
         options.Theme = ScalarTheme.Saturn;
-    });
+    })
+    .AllowAnonymous();
 }
 
 app.UseExceptionHandler();
@@ -94,6 +123,7 @@ app.UseHttpsRedirection();
 app.UseCors(CorsOptions.PolicyName);
 app.UseAuthentication();
 app.UseAuthorization();
+app.UseMiddleware<CurrentUserMiddleware>();
 app.MapControllers();
 app.MapHealthChecks("/health").AllowAnonymous();
 

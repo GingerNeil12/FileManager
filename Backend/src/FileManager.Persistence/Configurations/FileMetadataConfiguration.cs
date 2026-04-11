@@ -57,5 +57,11 @@ internal class FileMetadataConfiguration : IEntityTypeConfiguration<FileMetadata
             .WithOne(x => x.FileMetadata)
             .HasForeignKey(x => x.FileMetadataId)
             .OnDelete(DeleteBehavior.Cascade);
+
+        builder
+            .HasMany(x => x.Departments)
+            .WithOne(x => x.FileMetadata)
+            .HasForeignKey(x => x.FileMetadataId)
+            .OnDelete(DeleteBehavior.Restrict);
     }
 }

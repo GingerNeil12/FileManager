@@ -9,7 +9,7 @@ COPY . .
 WORKDIR "/src/src/FileManager.WebApi"
 RUN dotnet publish -c Release -o /app/publish --no-restore
 
-FROM mcr.microsoft.com/dotnet/aspnet:10.0-alpine AS runtime
+FROM mcr.microsoft.com/dotnet/aspnet:10.0 AS runtime
 WORKDIR /app
 COPY --from=build /app/publish .
 ENTRYPOINT ["dotnet", "FileManager.WebApi.dll"]

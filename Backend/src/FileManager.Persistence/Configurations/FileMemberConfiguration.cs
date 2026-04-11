@@ -28,7 +28,7 @@ internal class FileMemberConfiguration : IEntityTypeConfiguration<FileMember>
             .HasOne(x => x.AssignedTo)
             .WithMany(x => x.AssignedUploads)
             .HasForeignKey(x => x.AssignedToId)
-            .OnDelete(DeleteBehavior.Cascade);
+            .OnDelete(DeleteBehavior.NoAction);
 
         builder
             .HasOne(x => x.FileMetadata)

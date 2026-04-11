@@ -1,14 +1,37 @@
 services:
+  sqlserver:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    environment:
+      - ACCEPT_EULA=Y
+      - MSSQL_SA_PASSWORD=${MSSQL_SA_PASSWORD}
+    ports:
+      - "1433:1433"
+    volumes:
+      - sqlserver_data:/var/opt/mssql
+    healthcheck:
+      test: ["CMD-SHELL", "bash -c '</dev/tcp/localhost/1433'"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 20s
+
   backend:
     build:
       context: ./Backend
       dockerfile: src/FileManager.WebApi/Dockerfile
     ports:
       - "8080:8080"
+    depends_on:
+      sqlserver:
+        condition: service_healthy
     environment:
       - ASPNETCORE_HTTP_PORTS=8080
+      - ConnectionStrings__SqlServer=Server=sqlserver;Database=FileManager;User Id=sa;Password=${MSSQL_SA_PASSWORD};TrustServerCertificate=True
       - Auth0__Domain=${AUTH0_DOMAIN}
       - Auth0__Audience=${AUTH0_AUDIENCE}
+      - AUTH0__CLientId=${BACKEND_AUTH0_CLIENT_ID}
+      - AUTH0__ClientSecret=${BACKEND_AUTH0_CLIENT_SECRET}
+      - AUTH0__Connection=${BACKEND_AUTH0_CONNECTION}
       - Cors__AllowedOrigins__0=${CORS_ALLOWED_ORIGIN}
 
   frontend:
@@ -16,10 +39,13 @@ services:
       context: ./Frontend
       args:
         - AUTH0_DOMAIN=${AUTH0_DOMAIN}
-        - AUTH0_CLIENT_ID=${AUTH0_CLIENT_ID}
+        - AUTH0_CLIENT_ID=${FRONTEND_AUTH0_CLIENT_ID}
         - AUTH0_AUDIENCE=${AUTH0_AUDIENCE}
         - API_BASE_URL=${API_BASE_URL}
     ports:
       - "80:80"
     depends_on:
       - backend
+
+volumes:
+  sqlserver_data:

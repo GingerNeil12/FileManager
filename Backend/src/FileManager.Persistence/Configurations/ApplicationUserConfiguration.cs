@@ -1,7 +1,9 @@
+using FileManager.Domain.Common.Enums;
 using FileManager.Domain.Models;
 
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
+using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace FileManager.Persistence.Configurations;
 
@@ -25,10 +27,41 @@ internal class ApplicationUserConfiguration : IEntityTypeConfiguration<Applicati
         builder
             .HasIndex(x => x.ExternalProviderId)
             .IsUnique();
+        
+        builder
+            .Property(x => x.Email)
+            .HasMaxLength(512)
+            .IsRequired();
+
+        builder
+            .Property(x => x.GivenName)
+            .HasMaxLength(512)
+            .IsRequired();
+
+        builder
+            .Property(x => x.FamilyName)
+            .HasMaxLength(512)
+            .IsRequired();
+
+        builder
+            .Property(x => x.DepartmentId)
+            .IsRequired(false);
+
+        builder
+            .Property(x => x.IsActive)
+            .IsRequired();
+
+        builder
+            .Property(x => x.Role)
+            .HasConversion<EnumToStringConverter<UserRoles>>();
 
         builder
             .Property(x => x.CreatedOn)
             .IsRequired();
+
+        builder
+            .Property(x => x.LastLogin)
+            .IsRequired(false);
         
         builder
             .HasMany(x => x.Uploads)
@@ -40,6 +73,12 @@ internal class ApplicationUserConfiguration : IEntityTypeConfiguration<Applicati
             .HasMany(x => x.AssignedUploads)
             .WithOne(x => x.AssignedTo)
             .HasForeignKey(x => x.AssignedToId)
-            .OnDelete(DeleteBehavior.Cascade);
+            .OnDelete(DeleteBehavior.NoAction);
+
+        builder
+            .HasOne(x => x.Department)
+            .WithMany(x => x.Members)
+            .HasForeignKey(x => x.DepartmentId)
+            .OnDelete(DeleteBehavior.Restrict);
     }
 }
