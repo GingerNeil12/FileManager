@@ -15,6 +15,7 @@ internal static class DataSeeder
     internal static async Task SeedAsync(DbContext context, bool _, CancellationToken cancellationToken)
     {
         await SeedAdminUserAsync((ApplicationDbContext)context, cancellationToken);
+        await SeedDepartments((ApplicationDbContext)context, cancellationToken);
     }
 
     private static async Task SeedAdminUserAsync(ApplicationDbContext context, CancellationToken cancellationToken)
@@ -37,6 +38,27 @@ internal static class DataSeeder
         );
 
         context.Users.Add(admin);
+        await context.SaveChangesAsync(cancellationToken);
+    }
+
+    private static async Task SeedDepartments(ApplicationDbContext context, CancellationToken cancellationToken)
+    {
+        bool hasDepartments = await context.Departments.AnyAsync();
+
+        if (hasDepartments)
+        {
+            return;
+        }
+
+        var departments = new List<Department>
+        {
+            new() { Name = "HR"},
+            new() { Name = "Engineering"},
+            new() { Name = "Support"},
+            new() { Name = "Sales"},
+        };
+
+        context.Departments.AddRange(departments);
         await context.SaveChangesAsync(cancellationToken);
     }
 }

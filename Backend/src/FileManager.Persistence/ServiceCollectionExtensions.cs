@@ -21,7 +21,8 @@ public static class ServiceCollectionExtensions
             .AddDbContext<ApplicationDbContext>(options =>
                 options
                     .UseSqlServer(configuration.GetConnectionString("SqlServer"))
-                    .UseAsyncSeeding(DataSeeder.SeedAsync));
+                    .UseAsyncSeeding(DataSeeder.SeedAsync)
+                    .UseSeeding((_, _) => { }));
 
 
         services.AddSingleton<BlobContainerClient>(_ =>
