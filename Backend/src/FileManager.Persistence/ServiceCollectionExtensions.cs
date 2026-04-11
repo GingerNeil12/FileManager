@@ -2,6 +2,7 @@ using Azure.Storage.Blobs;
 
 using FileManager.Application.Common.Interfaces;
 using FileManager.Persistence.Repositories;
+using FileManager.Persistence.Seeding;
 
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -18,7 +19,10 @@ public static class ServiceCollectionExtensions
     {
         services
             .AddDbContext<ApplicationDbContext>(options =>
-                options.UseSqlServer(configuration.GetConnectionString("SqlServer")));
+                options
+                    .UseSqlServer(configuration.GetConnectionString("SqlServer"))
+                    .UseAsyncSeeding(DataSeeder.SeedAsync));
+
 
         services.AddSingleton<BlobContainerClient>(_ =>
         {
