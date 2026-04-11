@@ -1,6 +1,7 @@
 #nullable disable
 
 using FileManager.Domain.Common;
+using FileManager.Domain.Common.Enums;
 using FileManager.Domain.Common.Errors;
 using FileManager.Domain.Models;
 using FileManager.Persistence.Repositories;
@@ -65,7 +66,7 @@ public class ApplicationUserRepositoryTests
     public async Task GetByAsync_WhenUserExists_ReturnsSuccess()
     {
         // Arrange
-        ApplicationUser user = ApplicationUser.Create("provider-id", "email", "given_name", "family_name", null);
+        ApplicationUser user = ApplicationUser.Create("provider-id", "email", "given_name", "family_name", UserRoles.ExternalUser,  null);
         await SeedAsync(user);
 
         // Act
@@ -120,7 +121,7 @@ public class ApplicationUserRepositoryTests
     public async Task SaveAsync_WhenCalled_PersistsUser()
     {
         // Arrange
-        ApplicationUser user = ApplicationUser.Create("provider-id", "email", "given_name", "family_name", null);
+        ApplicationUser user = ApplicationUser.Create("provider-id", "email", "given_name", "family_name",  UserRoles.ExternalUser, null);
 
         // Act
         await _sut.SaveAsync(user, CancellationToken.None);
@@ -136,7 +137,7 @@ public class ApplicationUserRepositoryTests
     {
         // Arrange
         ApplicationUserRepository sut = CreateSutWithDisposedContext();
-        ApplicationUser user = ApplicationUser.Create("provider-id", "email", "given_name", "family_name", null);
+        ApplicationUser user = ApplicationUser.Create("provider-id", "email", "given_name", "family_name",  UserRoles.ExternalUser, null);
 
         // Act & Assert
         Assert.ThrowsAsync<ObjectDisposedException>(() =>
@@ -149,7 +150,7 @@ public class ApplicationUserRepositoryTests
         // Arrange
         ILogger<ApplicationUserRepository> mockLogger = Substitute.For<ILogger<ApplicationUserRepository>>();
         ApplicationUserRepository sut = CreateSutWithDisposedContext(mockLogger);
-        ApplicationUser user = ApplicationUser.Create("provider-id", "email", "given_name", "family_name", null);
+        ApplicationUser user = ApplicationUser.Create("provider-id", "email", "given_name", "family_name",  UserRoles.ExternalUser, null);
 
         // Act
         Assert.ThrowsAsync<ObjectDisposedException>(() =>

@@ -1,3 +1,5 @@
+using FileManager.Domain.Common.Enums;
+
 namespace FileManager.Domain.Models;
 
 public class ApplicationUser
@@ -8,6 +10,8 @@ public class ApplicationUser
         string email,
         string givenName,
         string familyName,
+        bool isActive,
+        UserRoles role,
         int? departmentId,
         DateTime createdOn
     )
@@ -17,15 +21,19 @@ public class ApplicationUser
         Email = email;
         GivenName = givenName;
         FamilyName = familyName;
+        IsActive = isActive;
+        Role = role;
         DepartmentId = departmentId;
         CreatedOn = createdOn;
     }
 
     public Guid Id { get; }
     public string ExternalProviderId { get; }
-    public string Email { get; }
-    public string GivenName { get; }
-    public string FamilyName { get; }
+    public string Email { get; private set; }
+    public string GivenName { get; private set; }
+    public string FamilyName { get; private set; }
+    public bool IsActive { get; private set; }
+    public UserRoles Role { get; private set; }
     public int? DepartmentId { get; }
     public DateTime CreatedOn { get; }
 
@@ -33,6 +41,23 @@ public class ApplicationUser
     public virtual ICollection<FileMetadata> Uploads { get; set; } = [];
     public virtual ICollection<FileMember> AssignedUploads { get; set; } = [];
 
-    public static ApplicationUser Create(string externalProviderId, string email, string givenName, string familyName, int? departmentId)
-        => new(Guid.NewGuid(), externalProviderId, email, givenName, familyName, departmentId, DateTime.UtcNow);
+    public static ApplicationUser Create(
+        string externalProviderId,
+        string email,
+        string givenName,
+        string familyName,
+        UserRoles role,
+        int? departmentId)
+        => new(Guid.NewGuid(), externalProviderId, email, givenName, familyName, true, role, departmentId, DateTime.UtcNow);
+
+    public void Disable() => IsActive = false;
+    public void Enable() => IsActive = true;
+    public void PurgeData()
+    {
+        const string value = "REDACTED";
+        Email = value;
+        GivenName = value;
+        FamilyName = value;
+    }
+    public void ChangeRole(UserRoles role) => Role = role;
 }

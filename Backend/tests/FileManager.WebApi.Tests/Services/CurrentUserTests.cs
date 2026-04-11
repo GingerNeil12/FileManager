@@ -36,7 +36,7 @@ public class CurrentUserTests
     public void Constructor_WhenAllClaimsValidAndUserFound_SetsAllProperties()
     {
         // Arrange
-        ApplicationUser user = ApplicationUser.Create("auth0|12345", "email", "given_name", "family_name", null);
+        ApplicationUser user = ApplicationUser.Create("auth0|12345", "email", "given_name", "family_name", UserRoles.ExternalUser, null);
         SetupHttpContext(BuildValidClaims());
         SetupRepositorySuccess(user);
 
@@ -97,7 +97,7 @@ public class CurrentUserTests
     public void IsInRole_WhenChecked_ReturnsExpected(UserRoles roleToCheck, bool expected)
     {
         // Arrange
-        ApplicationUser user = ApplicationUser.Create("auth0|12345", "email", "given_name", "family_name", null);
+        ApplicationUser user = ApplicationUser.Create("auth0|12345", "email", "given_name", "family_name", UserRoles.ExternalUser,  null);
         SetupHttpContext(BuildValidClaims());
         SetupRepositorySuccess(user);
         CurrentUser sut = new(_mockAccessor, _mockRepo);
