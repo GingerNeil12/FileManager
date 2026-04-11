@@ -114,7 +114,8 @@ if (app.Environment.IsDevelopment())
     {
         options.DarkMode = true;
         options.Theme = ScalarTheme.Saturn;
-    });
+    })
+    .AllowAnonymous();
 }
 
 app.UseExceptionHandler();
