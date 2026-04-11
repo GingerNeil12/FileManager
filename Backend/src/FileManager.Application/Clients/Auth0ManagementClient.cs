@@ -74,7 +74,7 @@ public class Auth0ManagementClient(
             grant_type = "client_credentials",
             client_id = _options.ClientId,
             client_secret = _options.ClientSecret,
-            audience = _options.ManagementAudience
+            audience = _options.Audience
         };
 
         using HttpResponseMessage response = await httpClient.PostAsJsonAsync(

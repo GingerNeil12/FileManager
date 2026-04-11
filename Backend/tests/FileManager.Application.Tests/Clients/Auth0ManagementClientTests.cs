@@ -42,7 +42,7 @@ public class Auth0ManagementClientTests
             Domain = DOMAIN,
             ClientId = CLIENT_ID,
             ClientSecret = CLIENT_SECRET,
-            ManagementAudience = MANAGEMENT_AUDIENCE,
+            Audience = MANAGEMENT_AUDIENCE,
             Connection = CONNECTION
         });
 

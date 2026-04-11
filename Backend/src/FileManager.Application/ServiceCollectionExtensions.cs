@@ -19,7 +19,7 @@ public static class ServiceCollectionExtensions
         services.AddValidatorsFromAssembly(typeof(ServiceCollectionExtensions).Assembly);
 
         services.Configure<Auth0ManagementOptions>(
-            configuration.GetSection(Auth0ManagementOptions.SectionName));
+            configuration.GetSection(Auth0ManagementOptions.SECTION_NAME));
 
         services.AddMemoryCache();
         services.AddHttpClient<IAuth0ManagementClient, Auth0ManagementClient>();
