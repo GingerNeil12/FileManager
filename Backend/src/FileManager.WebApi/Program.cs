@@ -4,6 +4,7 @@ using FileManager.Domain.Common.Enums;
 using FileManager.Persistence;
 using FileManager.WebApi;
 using FileManager.WebApi.Handlers;
+using FileManager.WebApi.Middleware;
 using FileManager.WebApi.Option;
 using FileManager.WebApi.Services;
 
@@ -120,6 +121,7 @@ app.UseHttpsRedirection();
 app.UseCors(CorsOptions.PolicyName);
 app.UseAuthentication();
 app.UseAuthorization();
+app.UseMiddleware<CurrentUserMiddleware>();
 app.MapControllers();
 app.MapHealthChecks("/health").AllowAnonymous();
 

@@ -4,4 +4,5 @@ public static class ApplicationConstants
 {
     public const string INTERNAL_ONLY_POLICY = "InternalOnly";
     public const string ADMIN_ONLY_POLICY = "AdminOnly";
+    public const string CURRENT_USER_ID = "CurrentUserId";
 }
