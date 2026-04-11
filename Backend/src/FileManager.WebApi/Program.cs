@@ -29,7 +29,7 @@ builder.Services.AddHttpContextAccessor();
 
 builder
     .Services
-    .AddApplication()
+    .AddApplication(builder.Configuration)
     .AddPersistence(builder.Configuration);
 
 builder
