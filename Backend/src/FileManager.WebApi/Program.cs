@@ -1,16 +1,18 @@
-using FileManager.Application.Common.Interfaces;
 using FileManager.Application;
+using FileManager.Application.Common.Interfaces;
+using FileManager.Domain.Common.Enums;
 using FileManager.Persistence;
+using FileManager.WebApi;
 using FileManager.WebApi.Handlers;
 using FileManager.WebApi.Option;
 using FileManager.WebApi.Services;
+
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 
 using Scalar.AspNetCore;
-using FileManager.Domain.Common.Enums;
-using FileManager.WebApi;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -94,6 +96,13 @@ builder.Services.AddAuthorization(options =>
 });
 
 var app = builder.Build();
+
+if (!string.IsNullOrEmpty(builder.Configuration.GetConnectionString("SqlServer")))
+{
+    using var scope = app.Services.CreateScope();
+    var db = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+    await db.Database.MigrateAsync();
+}
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
