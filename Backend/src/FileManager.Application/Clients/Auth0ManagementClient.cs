@@ -9,6 +9,7 @@ using FileManager.Domain.Common.Enums;
 using FileManager.Domain.Common.Errors;
 
 using Microsoft.Extensions.Caching.Memory;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
 namespace FileManager.Application.Clients;
@@ -16,7 +17,8 @@ namespace FileManager.Application.Clients;
 public class Auth0ManagementClient(
     HttpClient httpClient,
     IOptions<Auth0ManagementOptions> options,
-    IMemoryCache cache) : IAuth0ManagementClient
+    IMemoryCache cache,
+    ILogger<Auth0ManagementClient> logger) : IAuth0ManagementClient
 {
     private const string TOKEN_CACHE_KEY = "auth0_mgmt_token";
 
@@ -66,6 +68,7 @@ public class Auth0ManagementClient(
     {
         if (cache.TryGetValue(TOKEN_CACHE_KEY, out string? cachedToken) && cachedToken is not null)
         {
+            logger.LogDebug("Auth0 management token served from cache.");
             return cachedToken;
         }
 
@@ -84,18 +87,21 @@ public class Auth0ManagementClient(
 
         if (!response.IsSuccessStatusCode)
         {
+            logger.LogError("Failed to obtain Auth0 management token. Status: {StatusCode}.", (int)response.StatusCode);
             return new ExternalServiceError("Failed to obtain Auth0 Management API token.");
         }
 
         TokenResponse? tokenResponse = await response.Content.ReadFromJsonAsync<TokenResponse>(ct);
         if (tokenResponse?.AccessToken is null)
         {
+            logger.LogError("Auth0 token response was empty or malformed.");
             return new ExternalServiceError("Auth0 token response was empty or malformed.");
         }
 
         TimeSpan ttl = TimeSpan.FromSeconds(tokenResponse.ExpiresIn - 30);
         cache.Set(TOKEN_CACHE_KEY, tokenResponse.AccessToken, ttl);
 
+        logger.LogDebug("Auth0 management token fetched and cached for {Seconds}s.", (int)ttl.TotalSeconds);
         return tokenResponse.AccessToken;
     }
 
@@ -122,18 +128,58 @@ public class Auth0ManagementClient(
 
         using HttpResponseMessage response = await httpClient.SendAsync(request, ct);
 
+        if (response.StatusCode == System.Net.HttpStatusCode.Conflict)
+        {
+            logger.LogWarning("Auth0 user already exists for email {Email}. Fetching existing user ID.", email);
+            return await GetUserByEmailAsync(token, email, ct);
+        }
+
         if (!response.IsSuccessStatusCode)
         {
+            logger.LogError("Auth0 user creation failed for email {Email}. Status: {StatusCode}.", email, (int)response.StatusCode);
             return new ExternalServiceError($"Auth0 user creation failed with status {(int)response.StatusCode}.");
         }
 
         CreateUserResponse? userResponse = await response.Content.ReadFromJsonAsync<CreateUserResponse>(ct);
         if (userResponse?.UserId is null)
         {
+            logger.LogError("Auth0 create user response did not contain a user ID for email {Email}.", email);
             return new ExternalServiceError("Auth0 create user response did not contain a user ID.");
         }
 
+        logger.LogInformation("Auth0 user created with ID {UserId} for email {Email}.", userResponse.UserId, email);
         return userResponse.UserId;
+    }
+
+    private async Task<Result<string, Error>> GetUserByEmailAsync(
+        string token,
+        string email,
+        CancellationToken ct)
+    {
+        using HttpRequestMessage request = CreateAuthorizedRequest(
+            HttpMethod.Get,
+            $"{_options.Scheme}://{_options.Domain}/api/v2/users-by-email?email={Uri.EscapeDataString(email)}",
+            token);
+
+        using HttpResponseMessage response = await httpClient.SendAsync(request, ct);
+
+        if (!response.IsSuccessStatusCode)
+        {
+            logger.LogError("Auth0 user lookup by email failed for {Email}. Status: {StatusCode}.", email, (int)response.StatusCode);
+            return new ExternalServiceError($"Auth0 user lookup by email failed with status {(int)response.StatusCode}.");
+        }
+
+        CreateUserResponse[]? users = await response.Content.ReadFromJsonAsync<CreateUserResponse[]>(ct);
+        string? userId = users?.FirstOrDefault()?.UserId;
+
+        if (userId is null)
+        {
+            logger.LogError("Auth0 returned no user for email {Email}.", email);
+            return new ExternalServiceError($"Auth0 returned no user for email '{email}'.");
+        }
+
+        logger.LogInformation("Auth0 existing user resolved to ID {UserId} for email {Email}.", userId, email);
+        return userId;
     }
 
     private async Task<Result<string, Error>> LookupRoleIdAsync(
@@ -152,6 +198,7 @@ public class Auth0ManagementClient(
 
         if (!response.IsSuccessStatusCode)
         {
+            logger.LogError("Auth0 role lookup failed for role {RoleName}. Status: {StatusCode}.", roleName, (int)response.StatusCode);
             return new ExternalServiceError($"Auth0 role lookup failed with status {(int)response.StatusCode}.");
         }
 
@@ -160,6 +207,7 @@ public class Auth0ManagementClient(
 
         if (match?.Id is null)
         {
+            logger.LogError("Auth0 role '{RoleName}' was not found.", roleName);
             return new ExternalServiceError($"Auth0 role '{roleName}' was not found.");
         }
 
@@ -183,9 +231,11 @@ public class Auth0ManagementClient(
 
         if (!response.IsSuccessStatusCode)
         {
+            logger.LogError("Auth0 role assignment failed for user {UserId} with role {RoleId}. Status: {StatusCode}.", userId, roleId, (int)response.StatusCode);
             return new ExternalServiceError($"Auth0 role assignment failed with status {(int)response.StatusCode}.");
         }
 
+        logger.LogInformation("Auth0 role {RoleId} assigned to user {UserId}.", roleId, userId);
         return null;
     }
 

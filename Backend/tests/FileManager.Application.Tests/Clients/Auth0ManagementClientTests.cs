@@ -4,6 +4,7 @@ using FileManager.Domain.Common.Enums;
 using FileManager.Domain.Common.Errors;
 
 using Microsoft.Extensions.Caching.Memory;
+using Microsoft.Extensions.Logging.Abstractions;
 using Microsoft.Extensions.Options;
 
 using MsOptions = Microsoft.Extensions.Options.Options;
@@ -56,7 +57,7 @@ public class Auth0ManagementClientTests
             Connection = CONNECTION
         });
 
-        _sut = new Auth0ManagementClient(new HttpClient(), options, _cache);
+        _sut = new Auth0ManagementClient(new HttpClient(), options, _cache, NullLogger<Auth0ManagementClient>.Instance);
     }
 
     [TearDown]
@@ -173,6 +174,42 @@ public class Auth0ManagementClientTests
     }
 
     [Test]
+    public async Task CreateUserAsync_WhenUserAlreadyExistsInAuth0_LooksUpByEmailAndReturnsUserId()
+    {
+        // Arrange
+        StubTokenEndpoint();
+        StubConflictCreateUserEndpoint();
+        StubUserByEmailEndpoint();
+        StubRoleLookupEndpoint();
+        StubAssignRoleEndpoint();
+
+        // Act
+        var result = await _sut.CreateUserAsync("Jane", "Doe", "jane@example.com", UserRoles.InternalUser, CancellationToken.None);
+
+        // Assert
+        Assert.That(result.IsSuccess, Is.True);
+        Assert.That(result.Value, Is.EqualTo(TEST_USER_ID));
+    }
+
+    [Test]
+    public async Task CreateUserAsync_WhenUserAlreadyExistsInAuth0AndEmailLookupFails_ReturnsExternalServiceError()
+    {
+        // Arrange
+        StubTokenEndpoint();
+        StubConflictCreateUserEndpoint();
+        _wireMockServer
+            .Given(Request.Create().WithPath("/api/v2/users-by-email").UsingGet())
+            .RespondWith(Response.Create().WithStatusCode(500));
+
+        // Act
+        var result = await _sut.CreateUserAsync("Jane", "Doe", "jane@example.com", UserRoles.InternalUser, CancellationToken.None);
+
+        // Assert
+        Assert.That(result.IsSuccess, Is.False);
+        Assert.That(result.Error, Is.InstanceOf<ExternalServiceError>());
+    }
+
+    [Test]
     public async Task CreateUserAsync_WhenCalledTwice_FetchesTokenOnce()
     {
         // Arrange
@@ -235,5 +272,27 @@ public class Auth0ManagementClientTests
                 .UsingPost()
                 .WithHeader("Authorization", $"Bearer {TEST_ACCESS_TOKEN}"))
             .RespondWith(Response.Create().WithStatusCode(204));
+    }
+
+    private void StubConflictCreateUserEndpoint()
+    {
+        _wireMockServer
+            .Given(Request.Create()
+                .WithPath("/api/v2/users")
+                .UsingPost()
+                .WithHeader("Authorization", $"Bearer {TEST_ACCESS_TOKEN}"))
+            .RespondWith(Response.Create().WithStatusCode(409));
+    }
+
+    private void StubUserByEmailEndpoint()
+    {
+        _wireMockServer
+            .Given(Request.Create()
+                .WithPath("/api/v2/users-by-email")
+                .UsingGet()
+                .WithHeader("Authorization", $"Bearer {TEST_ACCESS_TOKEN}"))
+            .RespondWith(Response.Create()
+                .WithStatusCode(200)
+                .WithBodyAsJson(new[] { new { user_id = TEST_USER_ID } }));
     }
 }
