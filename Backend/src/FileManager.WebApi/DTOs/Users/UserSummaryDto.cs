@@ -1,7 +1,7 @@
 namespace FileManager.WebApi.DTOs.Users;
 
 public record UserSummaryDto(
-    Guid Id,
+    Guid UserId,
     string Email,
     string GivenName,
     string FamilyName,
