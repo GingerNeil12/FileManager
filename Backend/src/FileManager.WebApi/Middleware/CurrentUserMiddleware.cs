@@ -10,7 +10,7 @@ namespace FileManager.WebApi.Middleware;
 
 public class CurrentUserMiddleware(RequestDelegate next, TimeProvider timeProvider)
 {
-    private static readonly TimeSpan SESSION_THRESHOLD = TimeSpan.FromHours(1);
+    private static readonly TimeSpan _sessionThreshold = TimeSpan.FromHours(1);
 
     public async Task InvokeAsync(HttpContext context, IApplicationUserRepository applicationUserRepository)
     {
@@ -47,5 +47,5 @@ public class CurrentUserMiddleware(RequestDelegate next, TimeProvider timeProvid
     }
 
     private static bool ShouldUpdateLastLogin(ApplicationUser user, DateTimeOffset now)
-        => user.LastLogin is null || (now.UtcDateTime - user.LastLogin.Value) >= SESSION_THRESHOLD;
+        => user.LastLogin is null || (now.UtcDateTime - user.LastLogin.Value) >= _sessionThreshold;
 }
