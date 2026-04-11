@@ -1,4 +1,6 @@
 using FileManager.WebApi.DTOs.Common;
+using FileManager.WebApi.DTOs.FileManagements;
+
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -10,9 +12,12 @@ namespace FileManager.WebApi.Controllers;
 public class FileManagementController : ApplicationControllerBase
 {
     [HttpPost]
-    public IActionResult SaveUploadAsync()
+    [ProducesResponseType(StatusCodes.Status201Created, Type = typeof(IdResponseDto<Guid>))]
+    [ProducesResponseType(StatusCodes.Status409Conflict, Type = typeof(ProblemDetails))]
+    [ProducesResponseType(StatusCodes.Status500InternalServerError, Type = typeof(ProblemDetails))]
+    public IActionResult SaveUploadAsync([FromForm] SaveUploadDto dto, CancellationToken ct)
     {
-        return Ok();
+        return Created();
     }
 
     [HttpGet]
@@ -24,12 +29,19 @@ public class FileManagementController : ApplicationControllerBase
 
     [HttpGet]
     [Route("{id:guid}/metadata")]
+    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(MetadataProfileDto))]
+    [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(ProblemDetails))]
+    [ProducesResponseType(StatusCodes.Status500InternalServerError, Type = typeof(ProblemDetails))]
     public IActionResult GetMetadataAsync([FromRoute] Guid id, CancellationToken ct)
     {
         return Ok();
     }
 
     [HttpGet]
+    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(PaginatedResponseDto<MetadataSummaryDto>))]
+    [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(ValidationProblemDetails))]
+    [ProducesResponseType(StatusCodes.Status403Forbidden, Type = typeof(ProblemDetails))]
+    [ProducesResponseType(StatusCodes.Status500InternalServerError, Type = typeof(ProblemDetails))]
     public IActionResult GetFilteredAsync(QueryfilterDto queryfilterDto, CancellationToken ct)
     {
         return Ok();
@@ -37,6 +49,8 @@ public class FileManagementController : ApplicationControllerBase
 
     [HttpDelete]
     [Route("{id:guid}")]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(StatusCodes.Status500InternalServerError, Type = typeof(ProblemDetails))]
     public IActionResult DeleteAsync([FromRoute] Guid id, CancellationToken ct)
     {
         return NoContent();
