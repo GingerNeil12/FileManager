@@ -8,8 +8,10 @@ using FileManager.WebApi.Exceptions;
 
 namespace FileManager.WebApi.Middleware;
 
-public class CurrentUserMiddleware(RequestDelegate next)
+public class CurrentUserMiddleware(RequestDelegate next, TimeProvider timeProvider)
 {
+    private static readonly TimeSpan SESSION_THRESHOLD = TimeSpan.FromHours(1);
+
     public async Task InvokeAsync(HttpContext context, IApplicationUserRepository applicationUserRepository)
     {
         if (context.User.Identity?.IsAuthenticated == true)
@@ -25,14 +27,25 @@ public class CurrentUserMiddleware(RequestDelegate next)
                 throw new CurrentUserNotFoundException(externalProviderId);
             }
 
-            if (!userResult.Value!.IsActive)
+            ApplicationUser user = userResult.Value!;
+
+            if (!user.IsActive)
             {
                 throw new UserBlockedException(externalProviderId);
             }
 
-            context.Items[ApplicationConstants.CURRENT_USER_ID] = userResult.Value!.Id;
+            if (ShouldUpdateLastLogin(user, timeProvider.GetUtcNow()))
+            {
+                user.LoggedIn();
+                await applicationUserRepository.UpdateAsync(user, context.RequestAborted);
+            }
+
+            context.Items[ApplicationConstants.CURRENT_USER_ID] = user.Id;
         }
 
         await next(context);
     }
+
+    private static bool ShouldUpdateLastLogin(ApplicationUser user, DateTimeOffset now)
+        => user.LastLogin is null || (now.UtcDateTime - user.LastLogin.Value) >= SESSION_THRESHOLD;
 }

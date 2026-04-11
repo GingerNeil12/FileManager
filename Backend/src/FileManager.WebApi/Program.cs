@@ -34,6 +34,7 @@ builder
 
 builder
     .Services
+    .AddSingleton(TimeProvider.System)
     .AddScoped<ICurrentUser, CurrentUser>();
 
 builder
