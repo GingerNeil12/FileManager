@@ -9,6 +9,8 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.IdentityModel.Tokens;
 
 using Scalar.AspNetCore;
+using FileManager.Domain.Common.Enums;
+using FileManager.WebApi;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -49,6 +51,21 @@ builder.Services.AddCors(options =>
               .AllowAnyMethod();
     });
 });
+
+builder
+    .Services
+    .AddAuthorizationBuilder()
+    .AddPolicy(ApplicationConstants.INTERNAL_ONLY_POLICY, options =>
+    {
+        options.RequireRole(
+            UserRoles.InternalAdmin.ToString(),
+            UserRoles.InternalUser.ToString()
+        );
+    })
+    .AddPolicy(ApplicationConstants.ADMIN_ONLY_POLICY, options =>
+    {
+        options.RequireRole(UserRoles.InternalAdmin.ToString());
+    });
 
 var auth0Section = builder.Configuration.GetSection(Auth0Options.SectionName);
 builder.Services.Configure<Auth0Options>(auth0Section);

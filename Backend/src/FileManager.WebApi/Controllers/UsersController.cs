@@ -6,7 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace FileManager.WebApi.Controllers;
 
 [ApiController]
-[Authorize]
+[Authorize(Policy = ApplicationConstants.INTERNAL_ONLY_POLICY)]
 [Route("api/[controller]")]
 public class UsersController : ApplicationControllerBase
 {
@@ -42,6 +42,7 @@ public class UsersController : ApplicationControllerBase
 
     [HttpPut]
     [Route("{id:guid}")]
+    [Authorize(Policy = ApplicationConstants.ADMIN_ONLY_POLICY)]
     [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(IdResponseDto<Guid>))]
     [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(ValidationProblemDetails))]
     [ProducesResponseType(StatusCodes.Status403Forbidden, Type = typeof(ProblemDetails))]
