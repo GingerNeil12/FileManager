@@ -1100,7 +1100,7 @@
             "type": "string"
           },
           "role": {
-            "type": "string"
+            "$ref": "#/components/schemas/UserRoles"
           },
           "departmentId": {
             "pattern": "^-?(?:0|[1-9]\\d*)$",
@@ -1649,7 +1649,11 @@
         }
       },
       "UserRoles": {
-        "type": "integer"
+        "enum": [
+          "InternalAdmin",
+          "InternalUser",
+          "ExternalUser"
+        ]
       },
       "UserSummaryDto": {
         "required": [
