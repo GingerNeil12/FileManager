@@ -29,18 +29,18 @@ public class Auth0ManagementClient(
         Result<string, Error> userResult = await CreateAuth0UserAsync(givenName, familyName, email, ct);
         if (!userResult.IsSuccess)
         {
-            return userResult.Error!;
+            return userResult.Error;
         }
 
-        string userId = userResult.Value!;
+        string userId = userResult.Value;
 
         Result<string, Error> roleResult = await LookupRoleIdAsync(role, ct);
         if (!roleResult.IsSuccess)
         {
-            return roleResult.Error!;
+            return roleResult.Error;
         }
 
-        string roleId = roleResult.Value!;
+        string roleId = roleResult.Value;
 
         Error? assignError = await AssignRoleAsync(userId, roleId, ct);
         if (assignError is not null)

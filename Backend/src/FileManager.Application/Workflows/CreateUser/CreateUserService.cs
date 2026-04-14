@@ -56,10 +56,10 @@ public class CreateUserService(
         if (!auth0Result.IsSuccess)
         {
             logger.LogError("Auth0 user creation failed for email {Email}.", request.Email);
-            return auth0Result.Error!;
+            return auth0Result.Error;
         }
 
-        string externalProviderId = auth0Result.Value!;
+        string externalProviderId = auth0Result.Value;
         logger.LogInformation("Auth0 user created with ID {ExternalProviderId} for email {Email}.", externalProviderId, request.Email);
 
         ApplicationUser user = ApplicationUser.Create(

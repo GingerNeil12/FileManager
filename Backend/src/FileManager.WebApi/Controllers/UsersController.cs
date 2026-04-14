@@ -46,10 +46,10 @@ public class UsersController(ICreateUserService createUserService) : Application
 
         if (!result.IsSuccess)
         {
-            return GetResultFromError(result.Error!);
+            return GetResultFromError(result.Error);
         }
 
-        return CreatedAtAction(nameof(GetByIdAsync), new { id = result.Value }, new IdResponseDto<Guid>(result.Value!));
+        return CreatedAtAction(nameof(GetByIdAsync), new { id = result.Value }, new IdResponseDto<Guid>(result.Value));
     }
 
     [HttpPut]

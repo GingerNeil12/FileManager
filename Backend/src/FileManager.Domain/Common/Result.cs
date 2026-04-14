@@ -17,8 +17,8 @@ public readonly struct Result<TValue,TError>
         _value = default;
     }
 
-    public TValue? Value => _value;
-    public TError? Error => _error;
+    public TValue Value => _value ?? throw new InvalidOperationException("_value is null.");
+    public TError Error => _error ?? throw new InvalidOperationException("_error is null.");
     public bool IsSuccess => _error is null;
 
     public static implicit operator Result<TValue,TError>(TValue value) => new(value);
