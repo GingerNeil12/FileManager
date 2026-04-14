@@ -1,4 +1,5 @@
 using FileManager.Application.Workflows.CreateUser;
+using FileManager.Domain.Common.Enums;
 using FileManager.WebApi.DTOs.Common;
 using FileManager.WebApi.DTOs.Users;
 using FileManager.WebApi.Extensions;
@@ -64,5 +65,20 @@ public class UsersController(ICreateUserService createUserService) : Application
         CancellationToken ct)
     {
         return Ok();
+    }
+
+    [HttpGet]
+    [Route("roles")]
+    public IActionResult GetAllRoles()
+    {
+        var roleList = new List<string>
+        {
+            UserRoles.ExternalUser.ToString(),
+            UserRoles.InternalAdmin.ToString(),
+            UserRoles.InternalUser.ToString()
+        };
+        var paginatedResponse = new PaginatedResponseDto<string>(1, 100, roleList.Count, roleList);
+
+        return Ok(paginatedResponse);
     }
 }

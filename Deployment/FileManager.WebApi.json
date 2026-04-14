@@ -1028,6 +1028,18 @@
         }
       }
     },
+    "/api/users/roles": {
+      "get": {
+        "tags": [
+          "Users"
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
     "/api/version": {
       "get": {
         "tags": [
