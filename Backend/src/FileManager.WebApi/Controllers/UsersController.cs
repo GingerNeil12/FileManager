@@ -1,5 +1,8 @@
+using FileManager.Application.Workflows.CreateUser;
 using FileManager.WebApi.DTOs.Common;
 using FileManager.WebApi.DTOs.Users;
+using FileManager.WebApi.Extensions;
+
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -8,7 +11,7 @@ namespace FileManager.WebApi.Controllers;
 [ApiController]
 [Authorize(Policy = ApplicationConstants.INTERNAL_ONLY_POLICY)]
 [Route("api/[controller]")]
-public class UsersController : ApplicationControllerBase
+public class UsersController(ICreateUserService createUserService) : ApplicationControllerBase
 {
     [HttpGet]
     [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(PaginatedResponseDto<UserSummaryDto>))]
@@ -35,9 +38,17 @@ public class UsersController : ApplicationControllerBase
     [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(ValidationProblemDetails))]
     [ProducesResponseType(StatusCodes.Status403Forbidden, Type = typeof(ProblemDetails))]
     [ProducesResponseType(StatusCodes.Status500InternalServerError, Type = typeof(ProblemDetails))]
-    public IActionResult CreateAsync([FromBody] CreateUserDto dto, CancellationToken ct)
+    public async Task<IActionResult> CreateAsync([FromBody] CreateUserDto dto, CancellationToken ct)
     {
-        return Created();
+        CreateUserRequest request = dto.ToRequest();
+        var result = await createUserService.CreateAsync(request, ct);
+
+        if (!result.IsSuccess)
+        {
+            return GetResultFromError(result.Error!);
+        }
+
+        return CreatedAtAction(nameof(GetByIdAsync), new { id = result.Value }, new IdResponseDto<Guid>(result.Value!));
     }
 
     [HttpPut]
