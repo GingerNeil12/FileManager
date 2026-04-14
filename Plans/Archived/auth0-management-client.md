@@ -35,7 +35,7 @@ We need to be able to create a user in Auth0 via the Management API. This client
 ### Decisions Made During Implementation
 
 | Decision | Chosen Approach | Reason |
-|---|---|---|
+| --- | --- | --- |
 | Role ID resolution | Runtime lookup via `GET /api/v2/roles?name_filter={roleName}` | No config needed; Auth0 role names match `UserRoles` enum names exactly |
 | Management API audience | Explicit config value (`ManagementAudience` in options) | User preference |
 | Auth0 connection | Configurable (`Connection` in `Auth0ManagementOptions`) | Tenant connection names vary |
@@ -53,7 +53,7 @@ We need to be able to create a user in Auth0 via the Management API. This client
 ## Files Summary
 
 | File | Status |
-|---|---|
+| --- | --- |
 | `Backend/src/FileManager.Domain/Common/Errors/Error.cs` | Modified — added `ExternalService` to `ErrorType` enum |
 | `Backend/src/FileManager.Domain/Common/Errors/ExternalServiceError.cs` | Created |
 | `Backend/src/FileManager.Application/Options/Auth0ManagementOptions.cs` | Created |
