@@ -2,6 +2,7 @@ using FileManager.Application.Clients;
 using FileManager.Application.Common.Interfaces;
 using FileManager.Application.Options;
 using FileManager.Application.Workflows.CreateUser;
+using FileManager.Application.Workflows.GetFilteredDepartments;
 
 using FluentValidation;
 
@@ -39,7 +40,9 @@ public static class ServiceCollectionExtensions
         })
         .AddHttpMessageHandler<Auth0TokenHandler>();
 
-        services.AddScoped<ICreateUserService, CreateUserService>();
+        services
+            .AddScoped<ICreateUserService, CreateUserService>()
+            .AddScoped<IGetFilteredDepartmentsService, GetFilteredDepartmentsService>();
 
         return services;
     }

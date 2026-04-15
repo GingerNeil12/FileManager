@@ -1,3 +1,4 @@
+using FileManager.Application.Workflows.GetFilteredDepartments;
 using FileManager.WebApi.DTOs.Common;
 using FileManager.WebApi.DTOs.Departments;
 
@@ -9,15 +10,35 @@ namespace FileManager.WebApi.Controllers;
 [ApiController]
 [Route("api/[controller]")]
 [Authorize]
-public class DepartmentsController : ApplicationControllerBase
+public class DepartmentsController(
+    IGetFilteredDepartmentsService getFilteredDepartmentsService,
+    ILogger<DepartmentsController> logger
+) : ApplicationControllerBase
 {
     [HttpGet]
     [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(PaginatedResponseDto<DepartmentSummaryDto>))]
     [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(ValidationProblemDetails))]
     [ProducesResponseType(StatusCodes.Status500InternalServerError, Type = typeof(ProblemDetails))]
-    public IActionResult GetFilteredAsync(QueryfilterDto queryfilterDto, CancellationToken ct)
+    public async Task<IActionResult> GetFilteredAsync(QueryfilterDto queryfilterDto, CancellationToken ct)
     {
-        return Ok();
+        logger.LogInformation("Getting departments filered.");
+        var request = new GetFilteredDepartmentsRequest(
+            queryfilterDto.PageNumber,
+            queryfilterDto.PageSize,
+            queryfilterDto.SearchTerm,
+            queryfilterDto.OrderAscending
+        );
+
+        var response = await getFilteredDepartmentsService.GetFileredDepartmentsAsync(request, ct);
+
+        var paginatedResponse = new PaginatedResponseDto<DepartmentSummaryDto>(
+            response.PageNumber,
+            response.PageSize,
+            response.TotalDepartments,
+            [.. response.Departments.Select(x => new DepartmentSummaryDto(x.Id, x.Name))]
+        );
+
+        return Ok(paginatedResponse);
     }
 
     [HttpGet]

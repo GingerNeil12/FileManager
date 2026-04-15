@@ -4,7 +4,7 @@ namespace FileManager.Application.Common.Models.Specifications;
 
 public class DepartmentSpecification : Specification<Department>
 {
-    public DepartmentSpecification(string? nameSearch, int pageNumber, int pageSize)
+    public DepartmentSpecification(string? nameSearch, int pageNumber, int pageSize, bool? orderByAsc = true)
     {
         if (!string.IsNullOrWhiteSpace(nameSearch))
         {
