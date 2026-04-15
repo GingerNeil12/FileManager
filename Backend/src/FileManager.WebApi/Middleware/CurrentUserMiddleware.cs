@@ -27,7 +27,7 @@ public class CurrentUserMiddleware(RequestDelegate next, TimeProvider timeProvid
                 throw new CurrentUserNotFoundException(externalProviderId);
             }
 
-            ApplicationUser user = userResult.Value!;
+            ApplicationUser user = userResult.Value;
 
             if (!user.IsActive)
             {
