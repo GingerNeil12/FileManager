@@ -124,6 +124,7 @@ app.UseCors(CorsOptions.PolicyName);
 app.UseAuthentication();
 app.UseAuthorization();
 app.UseMiddleware<CurrentUserMiddleware>();
+app.UseMiddleware<RequestLoggingMiddleware>();
 app.MapControllers();
 app.MapHealthChecks("/health").AllowAnonymous();
 
